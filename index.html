@@ -6,18 +6,26 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="PlatDex">
-  <meta name="theme-color" content="#04050a">
+  <meta name="theme-color" content="#050711">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-512.png">
   <link rel="icon" type="image/png" href="icon-512.png">
   <title>PlatDex</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <style>
-    :root { --bg: #04050a; }
+    :root {
+      --bg: #050711;
+      --accent-1: #38bdf8;
+      --accent-2: #6366f1;
+    }
+    .eco-switch {
+      --accent-1: #fb7185;
+      --accent-2: #f97316;
+    }
     * { box-sizing: border-box; }
     html {
       height: 100%;
@@ -38,7 +46,7 @@
       font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-font-smoothing: antialiased;
       -webkit-tap-highlight-color: transparent;
-      padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+      padding-bottom: calc(5.8rem + env(safe-area-inset-bottom));
     }
     .font-display { font-family: "Cinzel", Georgia, serif; }
     .font-mono { font-family: "JetBrains Mono", monospace; }
@@ -46,56 +54,171 @@
     @media (max-width: 768px) {
       input, select, textarea { font-size: 16px !important; }
     }
-    .aurora {
-      position: fixed; inset: 0; width: 100vw; max-width: 100%;
-      z-index: -1; pointer-events: none; overflow: hidden;
+
+    /* --- FONDO NEXT-GEN (MESH + GRID + NEBULA + HAZ DE LUZ) --- */
+    .bg-stage {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      max-width: 100%;
+      z-index: -2;
+      pointer-events: none;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 80% 55% at 50% -15%, rgba(37, 99, 235, 0.28), transparent 68%),
+        radial-gradient(ellipse 60% 45% at 85% 95%, rgba(124, 58, 237, 0.22), transparent 65%),
+        linear-gradient(180deg, #060916 0%, #050711 55%, #070a18 100%);
+      transition: background 0.7s ease;
     }
-    .aurora-orb-1, .aurora-orb-2 {
-      position: absolute; border-radius: 9999px; filter: blur(110px); opacity: 0.45;
+    .eco-switch .bg-stage {
+      background:
+        radial-gradient(ellipse 80% 55% at 50% -15%, rgba(225, 29, 72, 0.28), transparent 68%),
+        radial-gradient(ellipse 60% 45% at 85% 95%, rgba(249, 115, 22, 0.2), transparent 65%),
+        linear-gradient(180deg, #12060c 0%, #07050a 55%, #11070d 100%);
+    }
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.032) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.032) 1px, transparent 1px);
+      background-size: 46px 46px;
+      mask-image: radial-gradient(ellipse 85% 75% at 50% 25%, black 25%, transparent 90%);
+      -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 25%, black 25%, transparent 90%);
+    }
+    .bg-beam {
+      position: absolute;
+      top: -35%;
+      left: -15%;
+      width: 130%;
+      height: 65%;
+      background: conic-gradient(from 120deg at 50% 50%, transparent 0deg, rgba(56, 189, 248, 0.14) 50deg, transparent 110deg, rgba(139, 92, 246, 0.14) 200deg, transparent 270deg);
+      filter: blur(70px);
+      animation: beamSpin 26s linear infinite;
+    }
+    .eco-switch .bg-beam {
+      background: conic-gradient(from 120deg at 50% 50%, transparent 0deg, rgba(251, 113, 133, 0.16) 50deg, transparent 110deg, rgba(249, 115, 22, 0.15) 200deg, transparent 270deg);
+    }
+    @keyframes beamSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .aurora-orb-1, .aurora-orb-2, .aurora-orb-3 {
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(110px);
       transition: background 0.7s ease;
     }
     .aurora-orb-1 {
-      width: 680px; height: 420px; top: -180px; left: 10%;
-      background: radial-gradient(circle, #2563eb 0%, #4f46e5 55%, transparent 100%);
-      animation: auroraFloat1 9s ease-in-out infinite;
+      width: 640px; height: 420px; top: -160px; left: -60px;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.72) 0%, rgba(79, 70, 229, 0.45) 55%, transparent 100%);
+      animation: auroraFloat1 10s ease-in-out infinite;
     }
     .aurora-orb-2 {
-      width: 520px; height: 380px; top: 80px; right: -120px;
-      background: radial-gradient(circle, #06b6d4 0%, #7c3aed 60%, transparent 100%);
-      opacity: 0.30;
-      animation: auroraFloat2 11s ease-in-out infinite;
+      width: 540px; height: 420px; top: 22%; right: -140px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.55) 0%, rgba(124, 58, 237, 0.42) 60%, transparent 100%);
+      animation: auroraFloat2 13s ease-in-out infinite;
     }
-    .eco-switch .aurora-orb-1 { background: radial-gradient(circle, #e11d48 0%, #be123c 55%, transparent 100%); }
-    .eco-switch .aurora-orb-2 { background: radial-gradient(circle, #f97316 0%, #db2777 60%, transparent 100%); }
+    .aurora-orb-3 {
+      width: 500px; height: 340px; bottom: -140px; left: 25%;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(14, 165, 233, 0.25) 60%, transparent 100%);
+      animation: auroraFloat3 15s ease-in-out infinite;
+    }
+    .eco-switch .aurora-orb-1 { background: radial-gradient(circle, rgba(225, 29, 72, 0.72) 0%, rgba(190, 18, 60, 0.45) 55%, transparent 100%); }
+    .eco-switch .aurora-orb-2 { background: radial-gradient(circle, rgba(249, 115, 22, 0.55) 0%, rgba(219, 39, 119, 0.42) 60%, transparent 100%); }
+    .eco-switch .aurora-orb-3 { background: radial-gradient(circle, rgba(244, 63, 94, 0.38) 0%, rgba(251, 146, 60, 0.22) 60%, transparent 100%); }
+
     @keyframes auroraFloat1 {
-      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.45; }
-      50% { transform: translate(140px, 80px) scale(1.28); opacity: 0.72; }
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.48; }
+      50% { transform: translate(120px, 70px) scale(1.22); opacity: 0.78; }
     }
     @keyframes auroraFloat2 {
-      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.30; }
-      50% { transform: translate(-130px, -70px) scale(1.25); opacity: 0.58; }
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.36; }
+      50% { transform: translate(-110px, -60px) scale(1.2); opacity: 0.65; }
     }
+    @keyframes auroraFloat3 {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.28; }
+      50% { transform: translate(60px, -50px) scale(1.18); opacity: 0.52; }
+    }
+
+    /* --- GLASS & SUPERFICIES --- */
     .glass-bar {
-      background: rgba(10, 12, 22, 0.78);
-      backdrop-filter: blur(26px) saturate(180%);
-      -webkit-backdrop-filter: blur(26px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.11);
-      box-shadow: 0 18px 40px -15px rgba(0, 0, 0, 0.75);
+      background: rgba(11, 15, 29, 0.76);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-top-color: rgba(255, 255, 255, 0.22);
+      box-shadow: 0 20px 45px -16px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     }
+    .glass-card {
+      background: linear-gradient(180deg, rgba(20, 26, 46, 0.66) 0%, rgba(10, 13, 24, 0.86) 100%);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-top-color: rgba(255, 255, 255, 0.18);
+    }
+
+    /* --- INDICADOR DESLIZANTE DE MENU --- */
+    .nav-pill-bg {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: 4px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.26), rgba(99, 102, 241, 0.28));
+      border: 1px solid rgba(125, 211, 252, 0.35);
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.22);
+      transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), width 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+    }
+    .eco-switch .nav-pill-bg {
+      background: linear-gradient(135deg, rgba(251, 113, 133, 0.28), rgba(249, 115, 22, 0.28));
+      border-color: rgba(253, 164, 175, 0.4);
+      box-shadow: 0 0 18px rgba(244, 63, 94, 0.25);
+    }
+    .mnav-pill-bg {
+      position: absolute;
+      top: 6px;
+      bottom: 6px;
+      left: 6px;
+      width: calc(33.333% - 4px);
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(99, 102, 241, 0.25));
+      border: 1px solid rgba(125, 211, 252, 0.32);
+      transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+    }
+    .eco-switch .mnav-pill-bg {
+      background: linear-gradient(135deg, rgba(251, 113, 133, 0.26), rgba(249, 115, 22, 0.24));
+      border-color: rgba(253, 164, 175, 0.35);
+    }
+
+    /* --- SKELETON SHIMMER --- */
+    @keyframes shimmerMove {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.11) 50%, rgba(255,255,255,0.04) 75%);
+      background-size: 200% 100%;
+      animation: shimmerMove 1.6s ease-in-out infinite;
+    }
+
+    /* --- TARJETAS Y EFECTOS --- */
     .poster-card {
       position: relative; border-radius: 18px; overflow: hidden;
-      background: #0d1019; border: 1px solid rgba(255, 255, 255, 0.09);
+      background: #0d111e; border: 1px solid rgba(255, 255, 255, 0.1);
       transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.28s ease, box-shadow 0.28s ease;
     }
     .poster-card:hover {
-      transform: translateY(-6px) scale(1.015);
-      border-color: rgba(96, 165, 250, 0.55);
-      box-shadow: 0 24px 50px -12px rgba(37, 99, 235, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      transform: translateY(-6px) scale(1.018);
+      border-color: rgba(96, 165, 250, 0.6);
+      box-shadow: 0 24px 50px -12px rgba(37, 99, 235, 0.42), 0 0 0 1px rgba(255, 255, 255, 0.1);
     }
     .poster-card:active { transform: scale(0.96); }
     .eco-switch .poster-card:hover {
-      border-color: rgba(251, 113, 133, 0.55);
-      box-shadow: 0 24px 50px -12px rgba(225, 29, 72, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      border-color: rgba(251, 113, 133, 0.6);
+      box-shadow: 0 24px 50px -12px rgba(225, 29, 72, 0.42), 0 0 0 1px rgba(255, 255, 255, 0.1);
     }
     @keyframes cardEnter {
       from { opacity: 0; transform: translateY(16px) scale(0.97); }
@@ -103,7 +226,7 @@
     }
     .card-stagger {
       animation: cardEnter 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
-      animation-delay: calc(var(--i, 0) * 32ms);
+      animation-delay: calc(var(--i, 0) * 30ms);
     }
     @keyframes holoSweep {
       0% { transform: translateX(-180%) rotate(25deg); }
@@ -117,9 +240,16 @@
       z-index: 20;
       background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.35), rgba(255, 255, 255, 0.65), rgba(168, 85, 247, 0.35), transparent);
       transform: translateX(-180%) rotate(25deg);
-      animation: holoSweep 4s ease-in-out infinite;
+      animation: holoSweep 4.2s ease-in-out infinite;
       pointer-events: none;
     }
+
+    /* --- BARRAS ANIMADAS --- */
+    .bar-fill {
+      transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* --- DRAWER DESLIZANTE --- */
     #detailDrawer { transition: opacity 0.25s ease; }
     #detailDrawer.drawer-closed { opacity: 0; pointer-events: none; }
     #detailDrawerPanel { transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1); }
@@ -127,22 +257,73 @@
     @media (min-width: 640px) {
       #detailDrawer.drawer-closed #detailDrawerPanel { transform: translateX(100%); }
     }
+
+    /* --- PERFIL SHOWCASE + PARTICULAS --- */
+    .profile-hero {
+      position: relative;
+      border-radius: 30px;
+      overflow: hidden;
+      border: 1px solid rgba(253, 224, 71, 0.26);
+      background: linear-gradient(145deg, rgba(16, 22, 42, 0.92) 0%, rgba(7, 10, 20, 0.98) 100%);
+      box-shadow: 0 30px 70px -20px rgba(0, 0, 0, 0.85), 0 0 60px -25px rgba(56, 189, 248, 0.3);
+    }
+    .avatar-ring {
+      position: relative;
+      padding: 3px;
+      border-radius: 9999px;
+      background: conic-gradient(from 0deg, #38bdf8, #818cf8, #fbbf24, #38bdf8);
+      animation: ringSpin 6s linear infinite;
+    }
+    @keyframes ringSpin {
+      from { filter: hue-rotate(0deg); }
+      to { filter: hue-rotate(360deg); }
+    }
+    .profile-particles {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .sparkle {
+      position: absolute;
+      bottom: -10px;
+      border-radius: 9999px;
+      background: radial-gradient(circle, #ffffff 0%, #7dd3fc 50%, transparent 100%);
+      opacity: 0;
+      animation: floatUp linear infinite;
+    }
+    .sparkle.gold {
+      background: radial-gradient(circle, #fef9c3 0%, #fbbf24 55%, transparent 100%);
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(0.6); opacity: 0; }
+      15% { opacity: 0.85; }
+      80% { opacity: 0.55; }
+      100% { transform: translateY(-340px) scale(1.2); opacity: 0; }
+    }
+    .trophy-pill {
+      background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+
     /* --- TROPHY HALL 3D --- */
     .hall-stage {
       position: relative;
       border-radius: 26px;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       background: #060810;
-      min-height: 440px;
+      min-height: 460px;
     }
     .hall-ambient {
       position: absolute;
       inset: 0;
       background-size: cover;
       background-position: center;
-      filter: blur(55px) saturate(160%);
-      opacity: 0.42;
+      filter: blur(55px) saturate(170%);
+      opacity: 0.45;
       transform: scale(1.2);
       transition: background-image 0.5s ease, opacity 0.5s ease;
       pointer-events: none;
@@ -173,20 +354,14 @@
       z-index: 10;
     }
     .hall-card.is-active .hall-frame {
-      box-shadow: 0 25px 60px -10px rgba(56, 189, 248, 0.45), 0 0 0 1px rgba(186, 230, 253, 0.55);
+      box-shadow: 0 25px 60px -10px rgba(56, 189, 248, 0.5), 0 0 0 1px rgba(186, 230, 253, 0.6);
     }
     .hall-card.is-switch.is-active .hall-frame {
-      box-shadow: 0 25px 60px -10px rgba(251, 113, 133, 0.45), 0 0 0 1px rgba(253, 164, 175, 0.55);
+      box-shadow: 0 25px 60px -10px rgba(251, 113, 133, 0.5), 0 0 0 1px rgba(253, 164, 175, 0.6);
     }
-    .museum-hall {
-      background:
-        radial-gradient(ellipse 75% 50% at 50% -10%, rgba(250, 204, 21, 0.18), transparent 70%),
-        linear-gradient(180deg, rgba(17, 20, 32, 0.92) 0%, rgba(7, 9, 15, 0.98) 100%);
-      border: 1px solid rgba(253, 224, 71, 0.2);
-    }
-    .pedestal-diamond { border: 1px solid rgba(192, 132, 252, 0.55); box-shadow: 0 0 40px -10px rgba(168, 85, 247, 0.45); }
-    .pedestal-gold { border: 1px solid rgba(250, 204, 21, 0.48); box-shadow: 0 0 40px -10px rgba(234, 179, 8, 0.35); }
-    .pedestal-crimson { border: 1px solid rgba(251, 113, 133, 0.55); box-shadow: 0 0 40px -10px rgba(225, 29, 72, 0.42); }
+    .pedestal-diamond { border: 1px solid rgba(192, 132, 252, 0.58); box-shadow: 0 0 42px -10px rgba(168, 85, 247, 0.5); }
+    .pedestal-gold { border: 1px solid rgba(250, 204, 21, 0.52); box-shadow: 0 0 42px -10px rgba(234, 179, 8, 0.4); }
+    .pedestal-crimson { border: 1px solid rgba(251, 113, 133, 0.58); box-shadow: 0 0 42px -10px rgba(225, 29, 72, 0.46); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     input[type=range] { -webkit-appearance: none; background: transparent; }
@@ -200,16 +375,21 @@
   </style>
 </head>
 <body class="min-h-screen md:pb-16">
-  <div class="aurora">
+  <!-- Fondo Next-Gen -->
+  <div class="bg-stage">
+    <div class="bg-grid"></div>
+    <div class="bg-beam"></div>
     <div class="aurora-orb-1"></div>
     <div class="aurora-orb-2"></div>
+    <div class="aurora-orb-3"></div>
   </div>
 
+  <!-- Header -->
   <header class="sticky top-0 z-40 px-3 sm:px-4 pt-3 pb-2" style="padding-top: calc(0.75rem + env(safe-area-inset-top));">
     <div class="max-w-7xl mx-auto glass-bar rounded-2xl px-3 md:px-5 py-2.5 flex items-center justify-between gap-2">
       <div class="flex items-center gap-2.5 min-w-0">
         <button type="button" onclick="switchView('overview')" class="flex items-center gap-2 shrink-0">
-          <div id="brand-icon" class="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 border border-sky-400/40 flex items-center justify-center shadow-lg shadow-sky-500/30 transition">
+          <div id="brand-icon" class="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 border border-sky-400/45 flex items-center justify-center shadow-lg shadow-sky-500/35 transition">
             <svg class="w-5 h-5" viewBox="0 0 64 64" fill="none">
               <defs>
                 <linearGradient id="platGrad" x1="12" y1="6" x2="52" y2="58" gradientUnits="userSpaceOnUse">
@@ -229,7 +409,10 @@
             </svg>
           </div>
           <div class="hidden sm:block text-left">
-            <p class="font-extrabold text-sm tracking-tight text-white leading-none">PlatDex</p>
+            <div class="flex items-center gap-1.5">
+              <p class="font-extrabold text-sm tracking-tight text-white leading-none">PlatDex</p>
+              <span id="bg-sync-dot" class="hidden w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" title="Sincronizando en segundo plano"></span>
+            </div>
             <p class="text-[10px] text-slate-400 font-mono mt-0.5">lQuackBertol</p>
           </div>
         </button>
@@ -240,10 +423,12 @@
         </div>
       </div>
 
-      <nav class="hidden lg:flex items-center gap-1 bg-white/[0.04] p-1 rounded-xl border border-white/[0.06]">
-        <button type="button" id="nav-overview" onclick="switchView('overview')" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-white/15 text-white transition">Inicio</button>
-        <button type="button" id="nav-library" onclick="switchView('library')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">Biblioteca</button>
-        <button type="button" id="nav-profile" onclick="switchView('profile')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">Perfil</button>
+      <!-- Menu Desktop con pildora deslizante -->
+      <nav id="desktop-nav" class="hidden lg:flex relative items-center gap-1 bg-white/[0.05] p-1 rounded-xl border border-white/10">
+        <div id="nav-pill" class="nav-pill-bg"></div>
+        <button type="button" id="nav-overview" onclick="switchView('overview')" class="relative z-10 px-4 py-1.5 rounded-lg text-xs font-bold text-white transition">Inicio</button>
+        <button type="button" id="nav-library" onclick="switchView('library')" class="relative z-10 px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">Biblioteca</button>
+        <button type="button" id="nav-profile" onclick="switchView('profile')" class="relative z-10 px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">Perfil</button>
       </nav>
 
       <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
@@ -265,23 +450,40 @@
   </header>
 
   <main class="max-w-7xl mx-auto px-3.5 md:px-6 pt-3 sm:pt-4">
-    <div id="initial-loader" class="py-28 flex flex-col items-center justify-center gap-3 text-center px-4">
-      <div class="w-10 h-10 rounded-full border-2 border-white/15 border-t-sky-400 animate-spin"></div>
-      <p id="loader-status" class="text-xs font-semibold text-slate-400 tracking-wide">Cargando PlatDex...</p>
+    <!-- Skeletons de Carga (Shimmer) -->
+    <div id="initial-loader" class="space-y-7 py-2">
+      <div class="skeleton rounded-[26px] h-[270px] md:h-[340px] border border-white/10"></div>
+      <div class="skeleton rounded-3xl h-36 border border-white/10"></div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="skeleton rounded-2xl h-24 border border-white/10"></div>
+        <div class="skeleton rounded-2xl h-24 border border-white/10"></div>
+        <div class="skeleton rounded-2xl h-24 border border-white/10"></div>
+        <div class="skeleton rounded-2xl h-24 border border-white/10"></div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3.5">
+        <div class="skeleton rounded-2xl aspect-[2/3] border border-white/10"></div>
+        <div class="skeleton rounded-2xl aspect-[2/3] border border-white/10"></div>
+        <div class="skeleton rounded-2xl aspect-[2/3] border border-white/10 hidden sm:block"></div>
+        <div class="skeleton rounded-2xl aspect-[2/3] border border-white/10 hidden sm:block"></div>
+        <div class="skeleton rounded-2xl aspect-[2/3] border border-white/10 hidden md:block"></div>
+        <div class="skeleton rounded-2xl aspect-[2/3] border border-white/10 hidden md:block"></div>
+      </div>
+      <p id="loader-status" class="text-center text-xs font-semibold text-slate-400 tracking-wide">Cargando PlatDex...</p>
     </div>
 
     <div id="app-views" class="hidden space-y-9">
 
+      <!-- VISTA INICIO -->
       <section id="view-overview" class="space-y-8 animate-fade">
         <div id="hero-spotlight" class="relative rounded-[26px] overflow-hidden border border-white/15 min-h-[260px] md:min-h-[340px] flex items-end shadow-2xl"></div>
 
-        <div class="relative rounded-3xl overflow-hidden border border-indigo-400/25 bg-gradient-to-br from-indigo-950/60 via-[#0d1020]/90 to-sky-950/45 p-4 md:p-6 shadow-xl space-y-4">
+        <div class="relative rounded-3xl overflow-hidden border border-indigo-400/25 bg-gradient-to-br from-indigo-950/65 via-[#0d1224]/90 to-sky-950/50 p-4 md:p-6 shadow-xl space-y-4">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div class="flex items-center gap-2.5">
-              <span class="text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full bg-indigo-500/25 text-indigo-200 border border-indigo-400/30">Copiloto Gemini</span>
+              <span class="text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full bg-indigo-500/25 text-indigo-200 border border-indigo-400/35">Copiloto Gemini</span>
               <p class="text-xs text-slate-300 hidden sm:inline">Busca por antojo, frena compras impulsivas o elige tu proximo reto</p>
             </div>
-            <div class="flex bg-black/40 p-1 rounded-full border border-white/10 self-start md:self-auto">
+            <div class="flex bg-black/45 p-1 rounded-full border border-white/10 self-start md:self-auto">
               <button type="button" id="aitab-mood" onclick="switchAiTool('mood')" class="px-3 py-1.5 rounded-full text-xs font-bold bg-white text-black transition">Antojo</button>
               <button type="button" id="aitab-buy" onclick="switchAiTool('buy')" class="px-3 py-1.5 rounded-full text-xs font-bold text-slate-300 hover:text-white transition">Lo compro?</button>
               <button type="button" id="aitab-next" onclick="switchAiTool('next')" class="px-3 py-1.5 rounded-full text-xs font-bold text-slate-300 hover:text-white transition">Que sigue?</button>
@@ -321,31 +523,31 @@
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div onclick="openLibTab(ecosystem === 'PS' ? 'Platinado' : '100% Completado')" class="cursor-pointer rounded-2xl bg-gradient-to-br from-sky-500/15 to-white/[0.02] hover:from-sky-500/25 border border-sky-400/20 p-4 transition">
+          <div onclick="openLibTab(ecosystem === 'PS' ? 'Platinado' : '100% Completado')" class="glass-card cursor-pointer rounded-2xl hover:border-sky-400/40 p-4 transition hover:-translate-y-1">
             <p id="kpi-1-lbl" class="text-[11px] font-bold uppercase tracking-wider text-sky-300">Platinos PS</p>
             <div class="flex items-baseline gap-2 mt-1">
-              <span id="kpi-1-val" class="text-2xl sm:text-3xl font-extrabold text-white">0</span>
+              <span id="kpi-1-val" class="text-2xl sm:text-3xl font-extrabold text-white font-mono">0</span>
               <span id="kpi-1-sub" class="text-[11px] text-slate-400 truncate"></span>
             </div>
           </div>
-          <div onclick="openLibTab('100% Completado')" class="cursor-pointer rounded-2xl bg-gradient-to-br from-emerald-500/15 to-white/[0.02] hover:from-emerald-500/25 border border-emerald-400/20 p-4 transition">
+          <div onclick="openLibTab('100% Completado')" class="glass-card cursor-pointer rounded-2xl hover:border-emerald-400/40 p-4 transition hover:-translate-y-1">
             <p class="text-[11px] font-bold uppercase tracking-wider text-emerald-300">Al 100%</p>
             <div class="flex items-baseline gap-2 mt-1">
-              <span id="kpi-2-val" class="text-2xl sm:text-3xl font-extrabold text-white">0</span>
+              <span id="kpi-2-val" class="text-2xl sm:text-3xl font-extrabold text-white font-mono">0</span>
               <span class="text-[11px] text-slate-400">completos</span>
             </div>
           </div>
-          <div onclick="openLibTab('Pendiente')" class="cursor-pointer rounded-2xl bg-gradient-to-br from-indigo-500/15 to-white/[0.02] hover:from-indigo-500/25 border border-indigo-400/20 p-4 transition">
+          <div onclick="openLibTab('Pendiente')" class="glass-card cursor-pointer rounded-2xl hover:border-indigo-400/40 p-4 transition hover:-translate-y-1">
             <p class="text-[11px] font-bold uppercase tracking-wider text-indigo-300">Backlog</p>
             <div class="flex items-baseline gap-2 mt-1">
-              <span id="kpi-3-val" class="text-2xl sm:text-3xl font-extrabold text-white">0</span>
+              <span id="kpi-3-val" class="text-2xl sm:text-3xl font-extrabold text-white font-mono">0</span>
               <span id="kpi-3-sub" class="text-[11px] text-slate-400">0h</span>
             </div>
           </div>
-          <div onclick="openLibTab('Abandonado')" class="cursor-pointer rounded-2xl bg-gradient-to-br from-rose-500/10 to-white/[0.02] hover:from-rose-500/20 border border-white/10 p-4 transition">
+          <div onclick="openLibTab('Abandonado')" class="glass-card cursor-pointer rounded-2xl hover:border-rose-400/35 p-4 transition hover:-translate-y-1">
             <p class="text-[11px] font-bold uppercase tracking-wider text-slate-300">Historia / Drop</p>
             <div class="flex items-baseline gap-2 mt-1">
-              <span id="kpi-4-val" class="text-2xl sm:text-3xl font-extrabold text-white">0 / 0</span>
+              <span id="kpi-4-val" class="text-2xl sm:text-3xl font-extrabold text-white font-mono">0 / 0</span>
             </div>
           </div>
         </div>
@@ -373,6 +575,7 @@
         </div>
       </section>
 
+      <!-- VISTA BIBLIOTECA -->
       <section id="view-library" class="hidden space-y-5 animate-fade">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3.5">
           <div>
@@ -409,73 +612,94 @@
         </div>
       </section>
 
+      <!-- VISTA PERFIL SHOWCASE -->
       <section id="view-profile" class="hidden space-y-8 animate-fade">
-        <div class="museum-hall rounded-[28px] p-5 md:p-9 shadow-2xl relative overflow-hidden space-y-6">
-          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div class="flex items-center gap-4">
-              <div id="prof-avatar-wrap" class="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-amber-300/60 overflow-hidden bg-black flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/20">
-                <span class="font-display text-lg font-bold text-amber-200">QB</span>
+        <div class="profile-hero p-5 md:p-9 space-y-6">
+          <div id="profile-hero-bg" class="absolute inset-0 bg-cover bg-center opacity-20 blur-2xl scale-110 pointer-events-none"></div>
+          <div class="absolute inset-0 bg-gradient-to-b from-[#0b1022]/65 via-[#070a14]/80 to-[#050711]/95 pointer-events-none"></div>
+          <div id="profile-particles" class="profile-particles"></div>
+
+          <!-- Cabecera Showcase -->
+          <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="flex items-center gap-4 sm:gap-5">
+              <div class="avatar-ring shrink-0 shadow-2xl shadow-sky-500/25">
+                <div id="prof-avatar-wrap" class="w-16 h-16 md:w-22 md:h-22 rounded-full overflow-hidden bg-[#080b16] flex items-center justify-center">
+                  <span class="font-display text-lg font-bold text-amber-200">QB</span>
+                </div>
               </div>
               <div class="min-w-0">
-                <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-amber-300">Perfil Global &middot; PlatDex</p>
-                <h2 class="font-display text-2xl md:text-4xl font-bold text-white tracking-wide mt-0.5 truncate">lQuackBertol</h2>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-[10px] font-extrabold uppercase tracking-[0.22em] px-2.5 py-0.5 rounded-full bg-amber-400/15 text-amber-300 border border-amber-300/30">Trophy Hunter</span>
+                  <span id="museum-rate" class="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">0% tasa global</span>
+                </div>
+                <h2 class="font-display text-2xl md:text-4xl font-extrabold text-white tracking-wide mt-1.5 truncate drop-shadow">lQuackBertol</h2>
                 <p id="museum-total-hours" class="text-xs text-slate-300 mt-1 font-mono">0 horas conquistadas</p>
               </div>
             </div>
 
-            <div class="flex flex-col gap-2 shrink-0">
-              <div class="flex items-center justify-between sm:justify-start gap-4 bg-black/55 border border-white/15 rounded-2xl px-4 py-3.5 backdrop-blur-md">
-                <div>
-                  <p class="text-[10px] uppercase tracking-widest text-slate-400">Nivel PSN</p>
-                  <p id="live-level" class="text-2xl font-extrabold font-mono text-white">-</p>
+            <!-- Vitrina PSN Nivel + Trofeos -->
+            <div class="flex flex-col gap-2.5 shrink-0">
+              <div class="trophy-pill rounded-2xl px-4 sm:px-5 py-3.5 backdrop-blur-md flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-500/30 to-indigo-600/30 border border-sky-400/40 flex flex-col items-center justify-center">
+                    <span class="text-[8px] uppercase tracking-widest text-sky-200">LVL</span>
+                    <span id="live-level" class="text-base font-extrabold font-mono text-white leading-none">-</span>
+                  </div>
+                  <div class="sm:hidden">
+                    <p class="text-[10px] uppercase tracking-wider text-slate-400">Nivel PlayStation</p>
+                    <p id="u-trophies-total-m" class="text-xs font-mono text-slate-200">Trofeos PSN: -</p>
+                  </div>
                 </div>
-                <div class="h-9 w-px bg-white/15"></div>
+                <div class="hidden sm:block h-10 w-px bg-white/15"></div>
                 <div class="grid grid-cols-4 gap-3 sm:gap-4">
-                  <div class="text-center"><div class="flex justify-center" id="svg-p"></div><span id="live-plat" class="font-mono text-xs font-bold text-white">-</span></div>
-                  <div class="text-center"><div class="flex justify-center" id="svg-g"></div><span id="live-gold" class="font-mono text-xs font-bold text-white">-</span></div>
-                  <div class="text-center"><div class="flex justify-center" id="svg-s"></div><span id="live-silver" class="font-mono text-xs font-bold text-white">-</span></div>
-                  <div class="text-center"><div class="flex justify-center" id="svg-b"></div><span id="live-bronze" class="font-mono text-xs font-bold text-white">-</span></div>
+                  <div class="text-center"><div class="flex justify-center" id="svg-p"></div><span id="live-plat" class="font-mono text-xs font-extrabold text-sky-200">-</span></div>
+                  <div class="text-center"><div class="flex justify-center" id="svg-g"></div><span id="live-gold" class="font-mono text-xs font-extrabold text-amber-200">-</span></div>
+                  <div class="text-center"><div class="flex justify-center" id="svg-s"></div><span id="live-silver" class="font-mono text-xs font-extrabold text-slate-200">-</span></div>
+                  <div class="text-center"><div class="flex justify-center" id="svg-b"></div><span id="live-bronze" class="font-mono text-xs font-extrabold text-orange-200">-</span></div>
                 </div>
               </div>
-              <div class="flex items-center justify-between text-[11px] text-slate-400 px-1 font-mono">
+              <div class="hidden sm:flex items-center justify-between text-[11px] text-slate-400 px-1 font-mono">
                 <span id="u-trophies-total">Trofeos PSN: -</span>
-                <span id="museum-rate" class="text-emerald-400 font-bold">0% tasa global</span>
+                <span id="prof-sync-time-top" class="text-slate-400"></span>
               </div>
             </div>
           </div>
 
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-white/10">
-            <div class="rounded-2xl bg-sky-500/10 border border-sky-400/25 p-3.5">
+          <!-- KPIs de Perfil -->
+          <div class="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-3 pt-4 border-t border-white/10">
+            <div class="rounded-2xl bg-sky-500/12 border border-sky-400/25 p-3.5 backdrop-blur-sm">
               <p class="text-[10px] font-bold uppercase tracking-wider text-sky-300">Platinos PlayStation</p>
               <p id="u-plats" class="text-2xl md:text-3xl font-extrabold text-white font-mono mt-1">0</p>
               <p id="u-plats-sub" class="text-[11px] text-slate-400 mt-0.5">PS5 / PS4</p>
             </div>
-            <div class="rounded-2xl bg-rose-500/10 border border-rose-400/25 p-3.5">
+            <div class="rounded-2xl bg-rose-500/12 border border-rose-400/25 p-3.5 backdrop-blur-sm">
               <p class="text-[10px] font-bold uppercase tracking-wider text-rose-300">Nintendo 100%</p>
               <p id="u-sw100" class="text-2xl md:text-3xl font-extrabold text-white font-mono mt-1">0</p>
               <p class="text-[11px] text-slate-400 mt-0.5">Switch / Switch 2</p>
             </div>
-            <div class="rounded-2xl bg-purple-500/10 border border-purple-400/25 p-3.5">
+            <div class="rounded-2xl bg-purple-500/12 border border-purple-400/25 p-3.5 backdrop-blur-sm">
               <p class="text-[10px] font-bold uppercase tracking-wider text-purple-300">Dificultad Extrema</p>
               <p id="u-hard-count" class="text-2xl md:text-3xl font-extrabold text-white font-mono mt-1">0</p>
               <p class="text-[11px] text-slate-400 mt-0.5">Retos Dif. 8-10</p>
             </div>
-            <div class="rounded-2xl bg-emerald-500/10 border border-emerald-400/25 p-3.5">
+            <div class="rounded-2xl bg-emerald-500/12 border border-emerald-400/25 p-3.5 backdrop-blur-sm">
               <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-300">Total Conquistas</p>
               <p id="u-total-done" class="text-2xl md:text-3xl font-extrabold text-white font-mono mt-1">0</p>
               <p id="u-total-sub" class="text-[11px] text-slate-400 mt-0.5">PS + Nintendo</p>
             </div>
           </div>
 
-          <div class="pt-3 border-t border-white/10">
+          <!-- Placa Curador IA -->
+          <div class="relative z-10 rounded-2xl bg-black/35 border border-amber-300/20 p-4 backdrop-blur-md">
             <div class="flex items-center justify-between gap-3">
-              <span id="curator-archetype" class="text-sm font-bold tracking-wide text-amber-200">Cazador de Platinos</span>
+              <span id="curator-archetype" class="text-sm font-extrabold tracking-wide text-amber-200">Cazador de Platinos</span>
               <button type="button" id="btn-curator" onclick="refreshCuratorPlaque()" class="text-[11px] font-bold text-amber-200 hover:text-black hover:bg-amber-300 px-3 py-1 rounded-full bg-amber-400/15 border border-amber-300/30 transition">Redactar placa IA</button>
             </div>
             <p id="curator-plaque" class="text-xs md:text-sm text-slate-300 mt-1.5 leading-relaxed">Presiona "Redactar placa IA" para que el curador analice tus conquistas y escriba el perfil oficial de tu galeria.</p>
           </div>
         </div>
 
+        <!-- Salon de la Fama -->
         <div id="masterpieces-section" class="space-y-4">
           <div class="flex items-end justify-between border-b border-white/10 pb-3 px-1">
             <div>
@@ -487,6 +711,7 @@
           <div id="museum-pedestals" class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 md:gap-5"></div>
         </div>
 
+        <!-- Muro + Trophy Hall 3D -->
         <div class="space-y-4">
           <div class="flex flex-col md:flex-row md:items-end justify-between gap-3 border-b border-white/10 pb-3 px-1">
             <div>
@@ -505,7 +730,8 @@
               </div>
               <input type="text" id="museumSearch" oninput="renderMuseumWall()" placeholder="Buscar..." class="bg-white/[0.06] border border-white/10 rounded-full px-3.5 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none w-36 sm:w-44">
               <select id="museumSort" onchange="renderMuseumWall()" class="bg-white/[0.06] border border-white/10 rounded-full px-3 py-1.5 text-xs text-slate-200 focus:outline-none">
-                <option value="order" class="bg-[#0d1017]">Cronologico</option>
+                <option value="recent" class="bg-[#0d1017]">Mas recientes</option>
+                <option value="order" class="bg-[#0d1017]">Orden original</option>
                 <option value="hard" class="bg-[#0d1017]">Mas dificiles</option>
                 <option value="hours" class="bg-[#0d1017]">Mas horas</option>
               </select>
@@ -519,7 +745,10 @@
             <div class="absolute inset-0 bg-gradient-to-t from-[#04050a] via-black/35 to-black/50 pointer-events-none"></div>
 
             <div class="relative z-10 flex items-center justify-between px-5 pt-4">
-              <span id="hall-counter" class="text-[11px] font-mono font-bold text-sky-300 bg-black/60 px-3 py-1 rounded-full border border-white/10">#01 / 00</span>
+              <div class="flex items-center gap-2">
+                <span id="hall-counter" class="text-[11px] font-mono font-bold text-sky-300 bg-black/60 px-3 py-1 rounded-full border border-white/10">#01 / 00</span>
+                <span id="hall-date-pill" class="hidden text-[11px] font-mono font-bold text-amber-200 bg-amber-500/15 px-3 py-1 rounded-full border border-amber-400/30"></span>
+              </div>
               <div class="flex items-center gap-1.5">
                 <button type="button" onclick="stepHall(-1)" class="w-8 h-8 rounded-full bg-black/60 hover:bg-white/20 text-white border border-white/15 flex items-center justify-center text-xs transition">&larr;</button>
                 <button type="button" onclick="stepHall(1)" class="w-8 h-8 rounded-full bg-black/60 hover:bg-white/20 text-white border border-white/15 flex items-center justify-center text-xs transition">&rarr;</button>
@@ -532,33 +761,37 @@
           </div>
         </div>
 
-        <div class="rounded-2xl bg-white/[0.03] border border-white/10 p-5 space-y-3">
+        <!-- Balance global -->
+        <div class="glass-card rounded-2xl p-5 space-y-3">
           <div class="flex items-center justify-between text-xs">
             <span class="font-bold text-slate-200">Balance global (PlayStation + Nintendo)</span>
             <span id="prof-sync-time" class="text-slate-400 font-mono text-[11px]"></span>
           </div>
-          <div id="prof-dist-bar" class="w-full h-2.5 rounded-full overflow-hidden flex bg-white/[0.06] gap-[2px]"></div>
+          <div id="prof-dist-bar" class="w-full h-3 rounded-full overflow-hidden flex bg-white/[0.06] gap-[2px]"></div>
           <div id="prof-dist-legend" class="flex flex-wrap gap-x-5 gap-y-1.5 text-[11px] text-slate-300"></div>
         </div>
       </section>
     </div>
   </main>
 
+  <!-- Menu Movil con pildora deslizante -->
   <nav class="lg:hidden fixed bottom-3 left-3 right-3 z-40 glass-bar rounded-2xl grid grid-cols-3 py-2 text-center" style="margin-bottom: env(safe-area-inset-bottom);">
-    <button type="button" id="mnav-overview" onclick="switchView('overview')" class="text-white flex flex-col items-center gap-0.5">
+    <div id="mnav-pill" class="mnav-pill-bg"></div>
+    <button type="button" id="mnav-overview" onclick="switchView('overview')" class="relative z-10 text-white flex flex-col items-center gap-0.5 py-0.5">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
       <span class="text-[10px] font-bold">Inicio</span>
     </button>
-    <button type="button" id="mnav-library" onclick="switchView('library')" class="text-slate-400 flex flex-col items-center gap-0.5">
+    <button type="button" id="mnav-library" onclick="switchView('library')" class="relative z-10 text-slate-400 flex flex-col items-center gap-0.5 py-0.5">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
       <span class="text-[10px] font-bold">Biblioteca</span>
     </button>
-    <button type="button" id="mnav-profile" onclick="switchView('profile')" class="text-slate-400 flex flex-col items-center gap-0.5">
+    <button type="button" id="mnav-profile" onclick="switchView('profile')" class="relative z-10 text-slate-400 flex flex-col items-center gap-0.5 py-0.5">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
       <span class="text-[10px] font-bold">Perfil</span>
     </button>
   </nav>
 
+  <!-- Drawer Detalles -->
   <div id="detailDrawer" onclick="if(event.target===this) closeDrawer()" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden drawer-closed flex items-end sm:items-stretch justify-end">
     <div id="detailDrawerPanel" class="w-full max-w-full sm:max-w-xl bg-[#090b12] sm:border-l border-t sm:border-t-0 border-white/10 rounded-t-3xl sm:rounded-none h-[92dvh] sm:h-[100dvh] flex flex-col shadow-2xl overflow-hidden">
       <div class="relative p-5 sm:p-6 border-b border-white/10 overflow-hidden shrink-0" style="padding-top: calc(1.25rem + env(safe-area-inset-top));">
@@ -679,6 +912,7 @@
     </div>
   </div>
 
+  <!-- Modal Agregar Juego -->
   <div id="addModal" onclick="if(event.target===this) closeAddModal()" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
     <div class="glass-bar rounded-3xl w-full max-w-md p-6 space-y-5">
       <div class="flex items-center justify-between">
@@ -727,11 +961,12 @@
     window.onerror = function(msg, url, line) {
       var el = document.getElementById('initial-loader');
       if (el && !el.classList.contains('hidden')) {
-        el.innerHTML = '<div class="max-w-md rounded-2xl bg-rose-950/70 border border-rose-500/40 p-4 text-xs text-rose-200"><b>Error JS:</b> ' + msg + ' (linea ' + line + ')</div>';
+        el.innerHTML = '<div class="max-w-md mx-auto rounded-2xl bg-rose-950/70 border border-rose-500/40 p-4 text-xs text-rose-200"><b>Error JS:</b> ' + msg + ' (linea ' + line + ')</div>';
       }
     };
 
     var API_URL = 'https://script.google.com/macros/s/AKfycbzBXQnyg0p0FShNtsG9YUWHNWI8SfVuLbypxJO_yxUcZw6ELPL-cD0R2brV5zGUYFqw0Q/exec';
+    var CACHE_KEY = 'platdex_cache_v2';
 
     function callApi(action, args, onOk, onErr) {
       fetch(API_URL, {
@@ -768,6 +1003,7 @@
     var trophyFilter = 'missing';
     var trophyCache = {};
     var coversRunning = false;
+    var countTimers = {};
 
     var STATUSES = ['Pendiente', 'Jugando', 'Platinado', '100% Completado', 'Completado', 'Abandonado'];
     var STATUS_LABELS = {
@@ -778,6 +1014,97 @@
       'Completado': 'Solo Historia',
       'Abandonado': 'Abandonados'
     };
+
+    function saveLocalCache() {
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({
+          games: allGames,
+          psnProfile: psnProfile,
+          curatorPS: curatorCache.PS,
+          curatorSW: curatorCache.Switch,
+          savedAt: Date.now()
+        }));
+      } catch (e) {}
+    }
+
+    function loadLocalCache() {
+      try {
+        var raw = localStorage.getItem(CACHE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function animateCount(elId, targetVal) {
+      var el = document.getElementById(elId);
+      if (!el) return;
+      var target = Number(targetVal) || 0;
+      var start = Number(el.dataset.val || 0);
+      if (start === target && el.innerText !== '' && el.innerText !== '-') {
+        el.innerText = target.toLocaleString();
+        return;
+      }
+      el.dataset.val = target;
+      if (countTimers[elId]) cancelAnimationFrame(countTimers[elId]);
+      var duration = 520;
+      var startTime = performance.now();
+      function step(now) {
+        var p = Math.min(1, (now - startTime) / duration);
+        var eased = 1 - Math.pow(1 - p, 3);
+        var val = Math.round(start + (target - start) * eased);
+        el.innerText = val.toLocaleString();
+        if (p < 1) countTimers[elId] = requestAnimationFrame(step);
+      }
+      countTimers[elId] = requestAnimationFrame(step);
+    }
+
+    function getRealDate(g) {
+      if (!g) return null;
+      var raw = g.completedDate || g.lastUpdated || '';
+      if (!raw && g.psnMeta) {
+        try {
+          var meta = typeof g.psnMeta === 'string' ? JSON.parse(g.psnMeta) : g.psnMeta;
+          raw = meta.lastUpdatedDateTime || meta.completedDate || '';
+        } catch (e) {}
+      }
+      if (!raw) return null;
+      var d = new Date(raw);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    function formatShortDate(d) {
+      if (!d) return '';
+      var months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+    }
+
+    function initProfileParticles() {
+      var box = document.getElementById('profile-particles');
+      if (!box || box.childElementCount > 0) return;
+      var html = '';
+      for (var i = 0; i < 24; i++) {
+        var left = (Math.random() * 100).toFixed(1);
+        var size = (2 + Math.random() * 4).toFixed(1);
+        var dur = (5 + Math.random() * 7).toFixed(1);
+        var delay = (Math.random() * 6).toFixed(1);
+        var isGold = i % 3 === 0 ? ' gold' : '';
+        html += '<span class="sparkle' + isGold + '" style="left:' + left + '%;width:' + size + 'px;height:' + size + 'px;animation-duration:' + dur + 's;animation-delay:-' + delay + 's;"></span>';
+      }
+      box.innerHTML = html;
+    }
+
+    function moveNavPill(view) {
+      var btn = document.getElementById('nav-' + view);
+      var pill = document.getElementById('nav-pill');
+      if (btn && pill) {
+        pill.style.width = btn.offsetWidth + 'px';
+        pill.style.transform = 'translateX(' + (btn.offsetLeft - 4) + 'px)';
+      }
+      var idx = view === 'overview' ? 0 : (view === 'library' ? 1 : 2);
+      var mpill = document.getElementById('mnav-pill');
+      if (mpill) mpill.style.transform = 'translateX(' + (idx * 100) + '%)';
+    }
 
     function trophySvg(type, size) {
       var sz = size || 'w-4 h-4';
@@ -848,30 +1175,56 @@
       toastT = setTimeout(function() { t.classList.add('hidden'); }, isErr ? 5000 : 3000);
     }
 
+    window.addEventListener('resize', function() { moveNavPill(currentView); });
+
     window.addEventListener('DOMContentLoaded', function() {
       document.getElementById('svg-p').innerHTML = trophySvg('platinum', 'w-4 h-4');
       document.getElementById('svg-g').innerHTML = trophySvg('gold', 'w-4 h-4');
       document.getElementById('svg-s').innerHTML = trophySvg('silver', 'w-4 h-4');
       document.getElementById('svg-b').innerHTML = trophySvg('bronze', 'w-4 h-4');
+      initProfileParticles();
+      requestAnimationFrame(function() { moveNavPill(currentView); });
+
+      var cached = loadLocalCache();
+      var hasCache = Boolean(cached && Array.isArray(cached.games) && cached.games.length);
+      var syncDot = document.getElementById('bg-sync-dot');
+
+      if (hasCache) {
+        allGames = cached.games;
+        psnProfile = cached.psnProfile || null;
+        curatorCache.PS = cached.curatorPS || null;
+        curatorCache.Switch = cached.curatorSW || null;
+        document.getElementById('initial-loader').classList.add('hidden');
+        document.getElementById('app-views').classList.remove('hidden');
+        if (syncDot) syncDot.classList.remove('hidden');
+        renderAll(false);
+      }
 
       var loadTimer = setTimeout(function() {
         var ls = document.getElementById('loader-status');
         if (ls) ls.innerText = 'Conectando con Google Apps Script...';
-      }, 10000);
+      }, 9000);
 
       callApi('getInitialData', [], function(data) {
         clearTimeout(loadTimer);
+        if (syncDot) syncDot.classList.add('hidden');
         allGames = (data && Array.isArray(data.games)) ? data.games : [];
         psnProfile = data ? data.psnProfile : null;
         curatorCache.PS = data ? data.curatorPS : null;
         curatorCache.Switch = data ? data.curatorSW : null;
+        saveLocalCache();
         document.getElementById('initial-loader').classList.add('hidden');
         document.getElementById('app-views').classList.remove('hidden');
-        renderAll();
+        renderAll(false);
       }, function(err) {
         clearTimeout(loadTimer);
+        if (syncDot) syncDot.classList.add('hidden');
+        if (hasCache) {
+          notify('Sin conexion: mostrando datos guardados', true);
+          return;
+        }
         document.getElementById('initial-loader').innerHTML =
-          '<div class="max-w-md rounded-2xl bg-rose-950/70 border border-rose-500/40 p-4 text-xs text-rose-200 leading-relaxed"><b>Error de conexion:</b> ' + escHtml(err && err.message ? err.message : err) + '</div>';
+          '<div class="max-w-md mx-auto rounded-2xl bg-rose-950/70 border border-rose-500/40 p-4 text-xs text-rose-200 leading-relaxed"><b>Error de conexion:</b> ' + escHtml(err && err.message ? err.message : err) + '</div>';
       });
     });
 
@@ -1040,7 +1393,7 @@
           var g = allGames.find(function(x) { return String(x.id) === String(id); });
           if (g) g.cover = map[id];
         });
-        renderAll();
+        renderAll(true);
         notify('Listo: ' + res.found + ' caratulas cargadas' + (res.remaining > 0 ? ' (quedan ' + res.remaining + ')' : '') + '.');
       }, function(err) {
         coversRunning = false;
@@ -1061,15 +1414,15 @@
         ? 'px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-bold bg-gradient-to-r from-rose-600 to-red-600 text-white shadow transition'
         : 'px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-bold text-slate-400 hover:text-white transition';
       document.getElementById('brand-icon').className = isPS
-        ? 'w-9 h-9 rounded-xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 border border-sky-400/40 flex items-center justify-center shadow-lg shadow-sky-500/30 transition'
-        : 'w-9 h-9 rounded-xl bg-gradient-to-br from-slate-900 via-rose-950 to-red-950 border border-rose-400/40 flex items-center justify-center shadow-lg shadow-rose-500/30 transition';
+        ? 'w-9 h-9 rounded-xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 border border-sky-400/45 flex items-center justify-center shadow-lg shadow-sky-500/35 transition'
+        : 'w-9 h-9 rounded-xl bg-gradient-to-br from-slate-900 via-rose-950 to-red-950 border border-rose-400/45 flex items-center justify-center shadow-lg shadow-rose-500/35 transition';
 
       document.getElementById('stab-Platinado').classList.toggle('hidden', !isPS);
       if (!isPS && currentStatusTab === 'Platinado') currentStatusTab = '100% Completado';
       document.getElementById('mood-results').classList.add('hidden');
       document.getElementById('ai-rec-results').classList.add('hidden');
       libLimit = 30;
-      renderAll();
+      renderAll(false);
     }
 
     function switchView(view) {
@@ -1078,10 +1431,11 @@
         var active = v === view;
         document.getElementById('view-' + v).classList.toggle('hidden', !active);
         var nb = document.getElementById('nav-' + v);
-        if (nb) nb.className = active ? 'px-4 py-1.5 rounded-lg text-xs font-bold bg-white/15 text-white transition' : 'px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition';
+        if (nb) nb.className = active ? 'relative z-10 px-4 py-1.5 rounded-lg text-xs font-bold text-white transition' : 'relative z-10 px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition';
         var mb = document.getElementById('mnav-' + v);
-        if (mb) mb.className = active ? 'text-white flex flex-col items-center gap-0.5' : 'text-slate-400 flex flex-col items-center gap-0.5';
+        if (mb) mb.className = active ? 'relative z-10 text-white flex flex-col items-center gap-0.5 py-0.5' : 'relative z-10 text-slate-400 flex flex-col items-center gap-0.5 py-0.5';
       });
+      moveNavPill(view);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -1101,7 +1455,7 @@
         if (res && Array.isArray(res.games)) allGames = res.games;
         if (res && res.psnProfile) psnProfile = res.psnProfile;
         trophyCache = {};
-        renderAll();
+        renderAll(true);
         notify(res.message || 'PSN sincronizado');
       }, function(err) {
         sp.classList.remove('animate-spin');
@@ -1109,7 +1463,8 @@
       });
     }
 
-    function renderAll() {
+    function renderAll(shouldSave) {
+      if (shouldSave !== false) saveLocalCache();
       updateCoversButton();
       renderOverview();
       renderLibrary();
@@ -1135,7 +1490,7 @@
         '<h4 class="text-xs font-extrabold text-white line-clamp-2 leading-snug drop-shadow">' + escHtml(g.title) + '</h4>' +
         '<p class="text-[10px] font-mono text-slate-300 mt-1">' + g.duration + 'h - Dif. ' + g.difficulty + '/10</p>' +
         '</div>' +
-        '<div class="absolute bottom-0 inset-x-0 h-1 bg-white/15"><div class="' + barColor + ' h-full" style="width:' + g.progress + '%"></div></div>' +
+        '<div class="absolute bottom-0 inset-x-0 h-1 bg-white/15"><div class="bar-fill ' + barColor + ' h-full" style="width:' + g.progress + '%"></div></div>' +
         '</div></div>';
     }
 
@@ -1151,12 +1506,12 @@
       var pendingHrs = pending.concat(playing).reduce(function(s, g) { return s + (Number(g.duration) || 0); }, 0);
 
       document.getElementById('kpi-1-lbl').innerText = isPS ? 'Platinos PS' : 'Switch 100%';
-      document.getElementById('kpi-1-val').innerText = isPS ? plats.length : full100.length;
+      animateCount('kpi-1-val', isPS ? plats.length : full100.length);
       document.getElementById('kpi-1-sub').innerText = isPS
         ? (plats.filter(function(g) { return g.platform === 'PS5'; }).length + ' PS5 - ' + plats.filter(function(g) { return g.platform === 'PS4'; }).length + ' PS4')
         : 'Switch / S2';
-      document.getElementById('kpi-2-val').innerText = full100.length;
-      document.getElementById('kpi-3-val').innerText = pending.length + playing.length;
+      animateCount('kpi-2-val', full100.length);
+      animateCount('kpi-3-val', pending.length + playing.length);
       document.getElementById('kpi-3-sub').innerText = pendingHrs.toLocaleString() + 'h';
       document.getElementById('kpi-4-val').innerText = story.length + ' / ' + dropped.length;
 
@@ -1166,8 +1521,8 @@
       if (heroGame) {
         var coverUrl = cleanCoverUrl(heroGame);
         var accent = isPS
-          ? 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 shadow-blue-500/30'
-          : 'bg-gradient-to-r from-rose-600 to-orange-500 hover:from-rose-500 hover:to-orange-400 shadow-rose-500/30';
+          ? 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 shadow-blue-500/35'
+          : 'bg-gradient-to-r from-rose-600 to-orange-500 hover:from-rose-500 hover:to-orange-400 shadow-rose-500/35';
         var heroBg = coverUrl
           ? '<div class="absolute inset-0 bg-cover bg-center scale-110 blur-xl opacity-55" style="background-image:url(\'' + escHtml(coverUrl) + '\')"></div>'
           : '<div class="absolute inset-0 bg-gradient-to-br ' + fallbackGradient(heroGame.title, !isPS) + ' opacity-90"></div>';
@@ -1175,8 +1530,8 @@
         var secondaryTab = isPS ? 'briefing' : 'info';
 
         heroEl.innerHTML = heroBg +
-          '<div class="absolute inset-0 bg-gradient-to-t from-[#04050a] via-[#04050a]/65 to-transparent"></div>' +
-          '<div class="absolute inset-0 bg-gradient-to-r from-[#04050a]/95 via-[#04050a]/45 to-transparent"></div>' +
+          '<div class="absolute inset-0 bg-gradient-to-t from-[#050711] via-[#050711]/65 to-transparent"></div>' +
+          '<div class="absolute inset-0 bg-gradient-to-r from-[#050711]/95 via-[#050711]/45 to-transparent"></div>' +
           '<div class="relative z-10 w-full p-5 md:p-9 flex flex-col sm:flex-row sm:items-end justify-between gap-5">' +
           '<div class="flex items-end gap-4 min-w-0">' +
           '<div class="hidden sm:block w-28 md:w-32 aspect-[2/3] rounded-2xl overflow-hidden border border-white/25 shadow-2xl shrink-0 bg-black">' + renderCover(heroGame, 'w-full h-full') + '</div>' +
@@ -1187,7 +1542,7 @@
           '<h2 class="text-2xl md:text-4xl font-extrabold text-white tracking-tight leading-tight line-clamp-2 drop-shadow">' + escHtml(heroGame.title) + '</h2>' +
           '<p class="text-xs md:text-sm text-slate-300 mt-1.5">' + escHtml(heroGame.notes || (heroGame.duration + 'h estimadas - Dificultad ' + heroGame.difficulty + '/10')) + '</p>' +
           '<div class="mt-3.5 flex items-center gap-3 max-w-sm">' +
-          '<div class="flex-1 bg-white/15 h-2 rounded-full overflow-hidden"><div class="bg-gradient-to-r from-sky-400 to-blue-500 h-full rounded-full" style="width:' + heroGame.progress + '%"></div></div>' +
+          '<div class="flex-1 bg-white/15 h-2 rounded-full overflow-hidden"><div class="bar-fill bg-gradient-to-r from-sky-400 to-blue-500 h-full rounded-full" style="width:' + heroGame.progress + '%"></div></div>' +
           '<span class="font-mono text-xs font-extrabold text-white">' + heroGame.progress + '%</span></div></div></div>' +
           '<div class="flex items-center gap-2.5 shrink-0">' +
           '<button type="button" onclick="openDrawer(\'' + heroGame.id + '\', \'' + primaryTab + '\')" class="' + accent + ' text-white text-xs font-extrabold px-5 py-2.5 sm:py-3 rounded-full shadow-lg transition">' + (isPS ? 'Ver trofeos' : 'Briefing IA') + '</button>' +
@@ -1286,11 +1641,11 @@
       var sw100 = allGames.filter(function(g) { return isSwitch(g) && g.status === '100% Completado'; });
       var allExhibited = psPlats.concat(sw100);
 
-      document.getElementById('u-plats').innerText = psPlats.length;
+      animateCount('u-plats', psPlats.length);
       document.getElementById('u-plats-sub').innerText = psPlats.filter(function(g) { return g.platform === 'PS5'; }).length + ' PS5 - ' + psPlats.filter(function(g) { return g.platform === 'PS4'; }).length + ' PS4';
-      document.getElementById('u-sw100').innerText = sw100.length;
-      document.getElementById('u-hard-count').innerText = allExhibited.filter(function(g) { return Number(g.difficulty) >= 8; }).length;
-      document.getElementById('u-total-done').innerText = allExhibited.length;
+      animateCount('u-sw100', sw100.length);
+      animateCount('u-hard-count', allExhibited.filter(function(g) { return Number(g.difficulty) >= 8; }).length);
+      animateCount('u-total-done', allExhibited.length);
       document.getElementById('u-total-sub').innerText = psPlats.length + ' PS - ' + sw100.length + ' Nintendo';
 
       var totalHrs = allExhibited.reduce(function(s, g) { return s + (Number(g.duration) || 0); }, 0);
@@ -1311,10 +1666,16 @@
         document.getElementById('live-silver').innerText = (et.silver != null) ? et.silver : '-';
         document.getElementById('live-bronze').innerText = (et.bronze != null) ? et.bronze : '-';
         var sumT = (Number(et.platinum) || 0) + (Number(et.gold) || 0) + (Number(et.silver) || 0) + (Number(et.bronze) || 0);
-        document.getElementById('u-trophies-total').innerText = sumT > 0 ? (sumT.toLocaleString() + ' trofeos totales en PSN') : 'Trofeos PSN: -';
+        var tTxt = sumT > 0 ? (sumT.toLocaleString() + ' trofeos totales en PSN') : 'Trofeos PSN: -';
+        document.getElementById('u-trophies-total').innerText = tTxt;
+        var mTxt = document.getElementById('u-trophies-total-m');
+        if (mTxt) mTxt.innerText = tTxt;
         if (psnProfile.lastSync) {
           var d = new Date(psnProfile.lastSync);
-          document.getElementById('prof-sync-time').innerText = 'Sync PSN: ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          var syncStr = 'Sync PSN: ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          document.getElementById('prof-sync-time').innerText = syncStr;
+          var topSync = document.getElementById('prof-sync-time-top');
+          if (topSync) topSync.innerText = syncStr;
         }
       }
 
@@ -1326,6 +1687,10 @@
         var hardest = allExhibited.slice()
           .sort(function(a, b) { return (Number(b.difficulty) - Number(a.difficulty)) || (Number(b.duration) - Number(a.duration)); })
           .slice(0, 4);
+
+        var heroBgUrl = hardest[0] ? cleanCoverUrl(hardest[0]) : '';
+        var pBg = document.getElementById('profile-hero-bg');
+        if (pBg && heroBgUrl) pBg.style.backgroundImage = 'url("' + heroBgUrl + '")';
 
         document.getElementById('museum-pedestals').innerHTML = hardest.map(function(g, idx) {
           var sw = isSwitch(g);
@@ -1369,7 +1734,7 @@
       ];
       document.getElementById('prof-dist-bar').innerHTML = segs.map(function(s) {
         var w = (counts[s.k] / total) * 100;
-        return w > 0 ? '<div class="' + s.color + ' h-full" style="width:' + w + '%"></div>' : '';
+        return w > 0 ? '<div class="bar-fill ' + s.color + ' h-full" style="width:' + w + '%"></div>' : '';
       }).join('');
       document.getElementById('prof-dist-legend').innerHTML = segs.map(function(s) {
         return '<span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full ' + s.color + '"></span>' + s.label + ' <b class="text-white font-mono">' + counts[s.k] + '</b></span>';
@@ -1394,11 +1759,23 @@
       pieces = pieces.map(function(g, i) {
         var copy = Object.assign({}, g);
         copy.museumNum = i + 1;
+        copy._dateObj = getRealDate(g);
         return copy;
       });
+
       if (q) pieces = pieces.filter(function(g) { return g.title.toLowerCase().indexOf(q) !== -1; });
-      if (sort === 'hard') pieces.sort(function(a, b) { return (b.difficulty - a.difficulty) || (b.duration - a.duration); });
-      else if (sort === 'hours') pieces.sort(function(a, b) { return b.duration - a.duration; });
+      if (sort === 'recent') {
+        pieces.sort(function(a, b) {
+          var ta = a._dateObj ? a._dateObj.getTime() : 0;
+          var tb = b._dateObj ? b._dateObj.getTime() : 0;
+          if (tb !== ta) return tb - ta;
+          return b.museumNum - a.museumNum;
+        });
+      } else if (sort === 'hard') {
+        pieces.sort(function(a, b) { return (b.difficulty - a.difficulty) || (b.duration - a.duration); });
+      } else if (sort === 'hours') {
+        pieces.sort(function(a, b) { return b.duration - a.duration; });
+      }
 
       var wall = document.getElementById('museum-wall');
       var hallView = document.getElementById('museum-hall-view');
@@ -1421,6 +1798,7 @@
       wall.innerHTML = pieces.map(function(g, idx) {
         var sw = isSwitch(g);
         var num = String(g.museumNum).padStart(2, '0');
+        var dStr = formatShortDate(g._dateObj);
         return '<div onclick="openDrawer(\'' + g.id + '\')" style="--i:' + Math.min(idx, 18) + '" class="poster-card card-stagger plat-holo cursor-pointer group">' +
           '<div class="relative aspect-[2/3] bg-black overflow-hidden">' +
           renderCover(g, 'w-full h-full group-hover:scale-105 transition duration-500') +
@@ -1429,7 +1807,7 @@
           '<span class="absolute top-2 right-2 text-[9px] font-extrabold px-1.5 py-0.5 rounded ' + (sw ? 'bg-rose-500/85 text-white' : 'bg-sky-500/85 text-black') + '">' + (sw ? '100%' : 'PLAT') + '</span>' +
           '<div class="absolute bottom-2.5 inset-x-2.5">' +
           '<h4 class="text-xs font-extrabold text-white line-clamp-2 leading-tight">' + escHtml(g.title) + '</h4>' +
-          '<p class="text-[10px] font-mono text-slate-300 mt-0.5">Dif. ' + g.difficulty + '/10 - ' + g.duration + 'h</p>' +
+          '<p class="text-[10px] font-mono text-slate-300 mt-0.5">' + (dStr ? (dStr + ' - ') : '') + 'Dif. ' + g.difficulty + '/10</p>' +
           '</div></div></div>';
       }).join('');
     }
@@ -1447,12 +1825,14 @@
       track.innerHTML = pieces.map(function(g, idx) {
         var sw = isSwitch(g);
         var num = String(g.museumNum).padStart(2, '0');
+        var yr = g._dateObj ? String(g._dateObj.getFullYear()) : '';
         return '<div data-idx="' + idx + '" onclick="focusHallCard(' + idx + ')" class="hall-card ' + (sw ? 'is-switch' : '') + (idx === 0 ? ' is-active' : '') + ' cursor-pointer">' +
           '<div class="hall-frame plat-holo relative aspect-[2/3] rounded-2xl overflow-hidden bg-black border border-white/15">' +
           renderCover(g, 'w-full h-full') +
-          '<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/25"></div>' +
+          '<div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/25"></div>' +
           '<span class="absolute top-2.5 left-2.5 font-mono text-[11px] font-extrabold text-white bg-black/75 px-2 py-0.5 rounded-lg border border-white/15">#' + num + '</span>' +
           '<span class="absolute top-2.5 right-2.5 text-[10px] font-extrabold px-2 py-0.5 rounded-lg ' + (sw ? 'bg-rose-500 text-white' : 'bg-sky-400 text-black') + '">' + (sw ? '100%' : 'PLAT') + '</span>' +
+          (yr ? '<span class="absolute bottom-2.5 left-2.5 font-mono text-[10px] font-bold text-amber-200 bg-black/70 px-2 py-0.5 rounded border border-amber-400/25">' + yr + '</span>' : '') +
           '</div></div>';
       }).join('');
 
@@ -1501,10 +1881,18 @@
       var sw = isSwitch(g);
       var num = String(g.museumNum).padStart(2, '0');
       var cUrl = cleanCoverUrl(g);
+      var dStr = formatShortDate(g._dateObj);
       document.getElementById('hall-ambient').style.backgroundImage = cUrl ? ('url("' + cUrl + '")') : 'none';
       document.getElementById('hall-counter').innerText = '#' + num + ' / ' + String(hallPieces.length).padStart(2, '0');
+      var datePill = document.getElementById('hall-date-pill');
+      if (dStr) {
+        datePill.innerText = dStr;
+        datePill.classList.remove('hidden');
+      } else {
+        datePill.classList.add('hidden');
+      }
       document.getElementById('hall-caption').innerHTML =
-        '<p class="text-[10px] font-bold uppercase tracking-[0.22em] ' + (sw ? 'text-rose-300' : 'text-sky-300') + '">' + escHtml(g.platform) + ' &middot; ' + (sw ? '100% Completado' : 'Trofeo Platino') + '</p>' +
+        '<p class="text-[10px] font-bold uppercase tracking-[0.22em] ' + (sw ? 'text-rose-300' : 'text-sky-300') + '">' + escHtml(g.platform) + ' &middot; ' + (sw ? '100% Completado' : 'Trofeo Platino') + (dStr ? (' &middot; ' + dStr) : '') + '</p>' +
         '<h4 class="font-display text-xl md:text-2xl font-bold text-white leading-tight">' + escHtml(g.title) + '</h4>' +
         '<p class="text-xs font-mono text-slate-300">Dificultad ' + g.difficulty + '/10 &middot; ' + g.duration + ' horas</p>' +
         '<div class="pt-2"><button type="button" onclick="openDrawer(\'' + g.id + '\')" class="px-4 py-1.5 rounded-full text-xs font-bold bg-white/15 hover:bg-white/25 text-white border border-white/20 transition">Ver ficha y trofeos</button></div>';
@@ -1518,6 +1906,7 @@
         btn.disabled = false;
         btn.innerText = 'Actualizar placa IA';
         curatorCache.PS = res;
+        saveLocalCache();
         renderMuseum();
         notify('Placa del curador actualizada');
       }, function(err) {
@@ -1533,6 +1922,7 @@
       activeGameId = g.id;
 
       var cUrl = cleanCoverUrl(g);
+      var dStr = formatShortDate(getRealDate(g));
       document.getElementById('d-bg-blur').style.backgroundImage = cUrl ? ('url("' + cUrl + '")') : 'none';
       document.getElementById('d-cover-wrap').innerHTML = renderCover(g, 'w-full h-full');
       document.getElementById('d-platform').innerText = g.platform;
@@ -1540,7 +1930,7 @@
       ab.innerText = g.alerts || '';
       ab.classList.toggle('hidden', !g.alerts);
       document.getElementById('d-title').innerText = g.title;
-      document.getElementById('d-meta').innerText = g.progress + '% - ' + g.duration + 'h - Dif. ' + g.difficulty + '/10';
+      document.getElementById('d-meta').innerText = g.progress + '% - ' + g.duration + 'h - Dif. ' + g.difficulty + '/10' + (dStr ? (' - ' + dStr) : '');
 
       document.getElementById('d-prog-slider').value = g.progress;
       document.getElementById('d-prog-label').innerText = g.progress + '%';
@@ -1602,12 +1992,13 @@
       g.status = st;
       if (st === 'Platinado' || st === '100% Completado') {
         g.progress = 100;
+        if (!getRealDate(g)) g.completedDate = new Date().toISOString();
         document.getElementById('d-prog-slider').value = 100;
         document.getElementById('d-prog-label').innerText = '100%';
         if (prevStatus !== st) triggerPlatCelebration(isSwitch(g));
       }
       renderDrawerStatusButtons(g);
-      renderAll();
+      renderAll(true);
       notify(st === 'Platinado' ? 'Platino desbloqueado!' : 'Estado actualizado');
       callApi('updateGameField', [g.id, { status: st, progress: g.progress }], null, function(err) {
         notify(err.message || 'Error guardando estado', true);
@@ -1619,7 +2010,7 @@
       if (!g) return;
       g.progress = Number(document.getElementById('d-prog-slider').value);
       document.getElementById('d-meta').innerText = g.progress + '% - ' + g.duration + 'h - Dif. ' + g.difficulty + '/10';
-      renderAll();
+      renderAll(true);
       notify('Progreso guardado');
       callApi('updateGameField', [g.id, { progress: g.progress }], null, function(err) {
         notify(err.message || 'Error guardando progreso', true);
@@ -1635,7 +2026,7 @@
       g.alerts = document.getElementById('d-alerts').value.trim();
       g.notes = document.getElementById('d-notes').value.trim();
       g.cover = document.getElementById('d-cover-url').value.trim();
-      renderAll();
+      renderAll(true);
       closeDrawer();
       notify('Cambios guardados');
       callApi('updateGameField', [g.id, {
@@ -1673,7 +2064,7 @@
         var ab = document.getElementById('d-alerts-badge');
         ab.innerText = ai.alerts || '';
         ab.classList.toggle('hidden', !ai.alerts);
-        renderAll();
+        renderAll(true);
         notify('Datos y caratula actualizados');
       }, function(err) {
         btn.disabled = false;
@@ -1687,7 +2078,7 @@
       var id = activeGameId;
       allGames = allGames.filter(function(x) { return String(x.id) !== String(id); });
       closeDrawer();
-      renderAll();
+      renderAll(true);
       notify('Juego eliminado');
       callApi('deleteGame', [id], null, function(err) {
         notify(err.message || 'Error eliminando juego', true);
@@ -1749,6 +2140,7 @@
       callApi('generarBriefingPlatinoIA', [g.id, g.title, g.platform, Boolean(forceRefresh)], function(briefing) {
         document.getElementById('briefing-loader').classList.add('hidden');
         g.briefing = briefing;
+        saveLocalCache();
         renderBriefingCards(briefing);
         document.getElementById('briefing-content').classList.remove('hidden');
         notify('Briefing guardado en tu base de datos');
@@ -1881,7 +2273,7 @@
         allGames.unshift(savedGame);
         document.getElementById('addForm').reset();
         closeAddModal();
-        renderAll();
+        renderAll(true);
         notify(useAI ? ('Agregado (' + savedGame.duration + 'h - Dif. ' + savedGame.difficulty + '/10)') : 'Juego agregado');
       }, function(err) {
         btn.disabled = false;
