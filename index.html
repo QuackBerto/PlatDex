@@ -737,10 +737,6 @@
       document.getElementById('svg-s').innerHTML = trophySvg('silver', 'w-4 h-4');
       document.getElementById('svg-b').innerHTML = trophySvg('bronze', 'w-4 h-4');
 
-      if (!API_URL || API_URL === 'https://script.google.com/macros/s/AKfycbzBXQnyg0p0FShNtsG9YUWHNWI8SfVuLbypxJO_yxUcZw6ELPL-cD0R2brV5zGUYFqw0Q/exec') {
-        document.getElementById('initial-loader').innerHTML =
-          '<div class="max-w-md rounded-2xl bg-amber-950/70 border border-amber-500/40 p-4 text-xs text-amber-200 leading-relaxed"><b>Falta configurar API_URL:</b> abre <code>index.html</code>, busca <code>https://script.google.com/macros/s/AKfycbzBXQnyg0p0FShNtsG9YUWHNWI8SfVuLbypxJO_yxUcZw6ELPL-cD0R2brV5zGUYFqw0Q/exec</code>https://script.google.com/macros/s/AKfycbzBXQnyg0p0FShNtsG9YUWHNWI8SfVuLbypxJO_yxUcZw6ELPL-cD0R2brV5zGUYFqw0Q/exec<code>/exec</code> de Google Apps Script.</div>';
-        return;
       }
 
       var loadTimer = setTimeout(function() {
