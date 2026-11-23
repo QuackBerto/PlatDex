@@ -51,29 +51,29 @@
       z-index: -1; pointer-events: none; overflow: hidden;
     }
     .aurora-orb-1, .aurora-orb-2 {
-      position: absolute; border-radius: 9999px; filter: blur(110px); opacity: 0.42;
+      position: absolute; border-radius: 9999px; filter: blur(110px); opacity: 0.45;
       transition: background 0.7s ease;
     }
     .aurora-orb-1 {
       width: 680px; height: 420px; top: -180px; left: 10%;
       background: radial-gradient(circle, #2563eb 0%, #4f46e5 55%, transparent 100%);
-      animation: auroraFloat1 16s ease-in-out infinite;
+      animation: auroraFloat1 9s ease-in-out infinite;
     }
     .aurora-orb-2 {
       width: 520px; height: 380px; top: 80px; right: -120px;
       background: radial-gradient(circle, #06b6d4 0%, #7c3aed 60%, transparent 100%);
-      opacity: 0.25;
-      animation: auroraFloat2 20s ease-in-out infinite;
+      opacity: 0.30;
+      animation: auroraFloat2 11s ease-in-out infinite;
     }
     .eco-switch .aurora-orb-1 { background: radial-gradient(circle, #e11d48 0%, #be123c 55%, transparent 100%); }
     .eco-switch .aurora-orb-2 { background: radial-gradient(circle, #f97316 0%, #db2777 60%, transparent 100%); }
     @keyframes auroraFloat1 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(45px, 30px) scale(1.12); }
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.45; }
+      50% { transform: translate(140px, 80px) scale(1.28); opacity: 0.72; }
     }
     @keyframes auroraFloat2 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(-40px, -25px) scale(1.08); }
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.30; }
+      50% { transform: translate(-130px, -70px) scale(1.25); opacity: 0.58; }
     }
     .glass-bar {
       background: rgba(10, 12, 22, 0.78);
@@ -106,17 +106,18 @@
       animation-delay: calc(var(--i, 0) * 32ms);
     }
     @keyframes holoSweep {
-      0% { transform: translateX(-160%) rotate(25deg); }
-      35%, 100% { transform: translateX(260%) rotate(25deg); }
+      0% { transform: translateX(-180%) rotate(25deg); }
+      45%, 100% { transform: translateX(300%) rotate(25deg); }
     }
     .plat-holo::after {
       content: "";
       position: absolute;
-      inset: -40%;
-      width: 45%;
-      background: linear-gradient(90deg, transparent, rgba(186, 230, 253, 0.28), rgba(255, 255, 255, 0.45), transparent);
-      transform: translateX(-160%) rotate(25deg);
-      animation: holoSweep 5.5s ease-in-out infinite;
+      inset: -50%;
+      width: 50%;
+      z-index: 20;
+      background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.35), rgba(255, 255, 255, 0.65), rgba(168, 85, 247, 0.35), transparent);
+      transform: translateX(-180%) rotate(25deg);
+      animation: holoSweep 4s ease-in-out infinite;
       pointer-events: none;
     }
     #detailDrawer { transition: opacity 0.25s ease; }
@@ -125,6 +126,57 @@
     #detailDrawer.drawer-closed #detailDrawerPanel { transform: translateY(100%); }
     @media (min-width: 640px) {
       #detailDrawer.drawer-closed #detailDrawerPanel { transform: translateX(100%); }
+    }
+    /* --- TROPHY HALL 3D --- */
+    .hall-stage {
+      position: relative;
+      border-radius: 26px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #060810;
+      min-height: 440px;
+    }
+    .hall-ambient {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: blur(55px) saturate(160%);
+      opacity: 0.42;
+      transform: scale(1.2);
+      transition: background-image 0.5s ease, opacity 0.5s ease;
+      pointer-events: none;
+    }
+    .hall-track {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 2.5rem calc(50% - 105px) 2rem;
+      perspective: 1100px;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-x pan-y;
+    }
+    .hall-card {
+      scroll-snap-align: center;
+      flex: 0 0 210px;
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease, filter 0.45s ease;
+      transform: scale(0.84) rotateY(14deg);
+      opacity: 0.5;
+      filter: brightness(0.75);
+    }
+    .hall-card.is-active {
+      transform: scale(1.06) rotateY(0deg);
+      opacity: 1;
+      filter: brightness(1.05);
+      z-index: 10;
+    }
+    .hall-card.is-active .hall-frame {
+      box-shadow: 0 25px 60px -10px rgba(56, 189, 248, 0.45), 0 0 0 1px rgba(186, 230, 253, 0.55);
+    }
+    .hall-card.is-switch.is-active .hall-frame {
+      box-shadow: 0 25px 60px -10px rgba(251, 113, 133, 0.45), 0 0 0 1px rgba(253, 164, 175, 0.55);
     }
     .museum-hall {
       background:
@@ -443,6 +495,10 @@
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <div class="flex bg-white/[0.06] p-1 rounded-full border border-white/10 text-[11px]">
+                <button type="button" id="mview-grid" onclick="setMuseumViewMode('grid')" class="px-3 py-1 rounded-full font-bold bg-white text-black transition">Muro</button>
+                <button type="button" id="mview-hall" onclick="setMuseumViewMode('hall')" class="px-3 py-1 rounded-full font-bold text-slate-300 hover:text-white transition">Trophy Hall</button>
+              </div>
+              <div class="flex bg-white/[0.06] p-1 rounded-full border border-white/10 text-[11px]">
                 <button type="button" id="meco-all" onclick="setMuseumFilter('all')" class="px-3 py-1 rounded-full font-bold bg-white text-black transition">Todos</button>
                 <button type="button" id="meco-PS" onclick="setMuseumFilter('PS')" class="px-3 py-1 rounded-full font-bold text-slate-300 hover:text-white transition">Platinos PS</button>
                 <button type="button" id="meco-Switch" onclick="setMuseumFilter('Switch')" class="px-3 py-1 rounded-full font-bold text-slate-300 hover:text-white transition">Nintendo 100%</button>
@@ -455,7 +511,25 @@
               </select>
             </div>
           </div>
+
           <div id="museum-wall" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5 md:gap-4"></div>
+
+          <div id="museum-hall-view" class="hidden hall-stage shadow-2xl">
+            <div id="hall-ambient" class="hall-ambient"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#04050a] via-black/35 to-black/50 pointer-events-none"></div>
+
+            <div class="relative z-10 flex items-center justify-between px-5 pt-4">
+              <span id="hall-counter" class="text-[11px] font-mono font-bold text-sky-300 bg-black/60 px-3 py-1 rounded-full border border-white/10">#01 / 00</span>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="stepHall(-1)" class="w-8 h-8 rounded-full bg-black/60 hover:bg-white/20 text-white border border-white/15 flex items-center justify-center text-xs transition">&larr;</button>
+                <button type="button" onclick="stepHall(1)" class="w-8 h-8 rounded-full bg-black/60 hover:bg-white/20 text-white border border-white/15 flex items-center justify-center text-xs transition">&rarr;</button>
+              </div>
+            </div>
+
+            <div id="hall-track" class="relative z-10 hall-track no-scrollbar" onscroll="updateHallActive()"></div>
+
+            <div id="hall-caption" class="relative z-10 px-6 pb-6 text-center space-y-1.5"></div>
+          </div>
         </div>
 
         <div class="rounded-2xl bg-white/[0.03] border border-white/10 p-5 space-y-3">
@@ -685,6 +759,9 @@
     var currentView = 'overview';
     var currentStatusTab = 'Pendiente';
     var museumEcoFilter = 'all';
+    var museumViewMode = 'grid';
+    var hallPieces = [];
+    var hallActiveIdx = 0;
     var libLimit = 30;
     var activeGameId = null;
     var currentTrophies = [];
@@ -1182,6 +1259,17 @@
       grid.innerHTML = slice.map(function(g, idx) { return posterCardHtml(g, '', idx); }).join('');
     }
 
+    function setMuseumViewMode(mode) {
+      museumViewMode = mode;
+      document.getElementById('mview-grid').className = mode === 'grid'
+        ? 'px-3 py-1 rounded-full font-bold bg-white text-black transition'
+        : 'px-3 py-1 rounded-full font-bold text-slate-300 hover:text-white transition';
+      document.getElementById('mview-hall').className = mode === 'hall'
+        ? 'px-3 py-1 rounded-full font-bold bg-gradient-to-r from-sky-400 to-indigo-400 text-black transition'
+        : 'px-3 py-1 rounded-full font-bold text-slate-300 hover:text-white transition';
+      renderMuseumWall();
+    }
+
     function setMuseumFilter(f) {
       museumEcoFilter = f;
       ['all', 'PS', 'Switch'].forEach(function(k) {
@@ -1313,6 +1401,18 @@
       else if (sort === 'hours') pieces.sort(function(a, b) { return b.duration - a.duration; });
 
       var wall = document.getElementById('museum-wall');
+      var hallView = document.getElementById('museum-hall-view');
+
+      if (museumViewMode === 'hall') {
+        wall.classList.add('hidden');
+        hallView.classList.remove('hidden');
+        renderTrophyHall(pieces);
+        return;
+      }
+
+      hallView.classList.add('hidden');
+      wall.classList.remove('hidden');
+
       if (!pieces.length) {
         wall.innerHTML = '<div class="col-span-full py-14 text-center text-xs text-slate-500">Sin piezas para este filtro.</div>';
         return;
@@ -1332,6 +1432,82 @@
           '<p class="text-[10px] font-mono text-slate-300 mt-0.5">Dif. ' + g.difficulty + '/10 - ' + g.duration + 'h</p>' +
           '</div></div></div>';
       }).join('');
+    }
+
+    function renderTrophyHall(pieces) {
+      hallPieces = pieces;
+      hallActiveIdx = 0;
+      var track = document.getElementById('hall-track');
+      if (!pieces.length) {
+        track.innerHTML = '<p class="text-xs text-slate-400 mx-auto py-16">Sin conquistas para este filtro.</p>';
+        document.getElementById('hall-caption').innerHTML = '';
+        return;
+      }
+
+      track.innerHTML = pieces.map(function(g, idx) {
+        var sw = isSwitch(g);
+        var num = String(g.museumNum).padStart(2, '0');
+        return '<div data-idx="' + idx + '" onclick="focusHallCard(' + idx + ')" class="hall-card ' + (sw ? 'is-switch' : '') + (idx === 0 ? ' is-active' : '') + ' cursor-pointer">' +
+          '<div class="hall-frame plat-holo relative aspect-[2/3] rounded-2xl overflow-hidden bg-black border border-white/15">' +
+          renderCover(g, 'w-full h-full') +
+          '<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/25"></div>' +
+          '<span class="absolute top-2.5 left-2.5 font-mono text-[11px] font-extrabold text-white bg-black/75 px-2 py-0.5 rounded-lg border border-white/15">#' + num + '</span>' +
+          '<span class="absolute top-2.5 right-2.5 text-[10px] font-extrabold px-2 py-0.5 rounded-lg ' + (sw ? 'bg-rose-500 text-white' : 'bg-sky-400 text-black') + '">' + (sw ? '100%' : 'PLAT') + '</span>' +
+          '</div></div>';
+      }).join('');
+
+      track.scrollLeft = 0;
+      paintHallCaption(0);
+    }
+
+    function focusHallCard(idx) {
+      if (idx === hallActiveIdx && hallPieces[idx]) {
+        openDrawer(hallPieces[idx].id);
+        return;
+      }
+      var track = document.getElementById('hall-track');
+      var card = track.querySelector('[data-idx="' + idx + '"]');
+      if (card) card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+
+    function stepHall(dir) {
+      var next = Math.max(0, Math.min(hallPieces.length - 1, hallActiveIdx + dir));
+      focusHallCard(next);
+    }
+
+    function updateHallActive() {
+      var track = document.getElementById('hall-track');
+      var center = track.scrollLeft + track.clientWidth / 2;
+      var cards = track.querySelectorAll('.hall-card');
+      var bestIdx = 0;
+      var bestDist = Infinity;
+
+      cards.forEach(function(c, i) {
+        var cCenter = c.offsetLeft + c.offsetWidth / 2;
+        var dist = Math.abs(center - cCenter);
+        if (dist < bestDist) { bestDist = dist; bestIdx = i; }
+      });
+
+      if (bestIdx !== hallActiveIdx) {
+        hallActiveIdx = bestIdx;
+        cards.forEach(function(c, i) { c.classList.toggle('is-active', i === bestIdx); });
+        paintHallCaption(bestIdx);
+      }
+    }
+
+    function paintHallCaption(idx) {
+      var g = hallPieces[idx];
+      if (!g) return;
+      var sw = isSwitch(g);
+      var num = String(g.museumNum).padStart(2, '0');
+      var cUrl = cleanCoverUrl(g);
+      document.getElementById('hall-ambient').style.backgroundImage = cUrl ? ('url("' + cUrl + '")') : 'none';
+      document.getElementById('hall-counter').innerText = '#' + num + ' / ' + String(hallPieces.length).padStart(2, '0');
+      document.getElementById('hall-caption').innerHTML =
+        '<p class="text-[10px] font-bold uppercase tracking-[0.22em] ' + (sw ? 'text-rose-300' : 'text-sky-300') + '">' + escHtml(g.platform) + ' &middot; ' + (sw ? '100% Completado' : 'Trofeo Platino') + '</p>' +
+        '<h4 class="font-display text-xl md:text-2xl font-bold text-white leading-tight">' + escHtml(g.title) + '</h4>' +
+        '<p class="text-xs font-mono text-slate-300">Dificultad ' + g.difficulty + '/10 &middot; ' + g.duration + ' horas</p>' +
+        '<div class="pt-2"><button type="button" onclick="openDrawer(\'' + g.id + '\')" class="px-4 py-1.5 rounded-full text-xs font-bold bg-white/15 hover:bg-white/25 text-white border border-white/20 transition">Ver ficha y trofeos</button></div>';
     }
 
     function refreshCuratorPlaque() {
