@@ -15,6 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <style>
     :root { --bg: #04050a; }
     * { box-sizing: border-box; }
@@ -56,14 +57,24 @@
     .aurora-orb-1 {
       width: 680px; height: 420px; top: -180px; left: 10%;
       background: radial-gradient(circle, #2563eb 0%, #4f46e5 55%, transparent 100%);
+      animation: auroraFloat1 16s ease-in-out infinite;
     }
     .aurora-orb-2 {
       width: 520px; height: 380px; top: 80px; right: -120px;
       background: radial-gradient(circle, #06b6d4 0%, #7c3aed 60%, transparent 100%);
       opacity: 0.25;
+      animation: auroraFloat2 20s ease-in-out infinite;
     }
     .eco-switch .aurora-orb-1 { background: radial-gradient(circle, #e11d48 0%, #be123c 55%, transparent 100%); }
     .eco-switch .aurora-orb-2 { background: radial-gradient(circle, #f97316 0%, #db2777 60%, transparent 100%); }
+    @keyframes auroraFloat1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(45px, 30px) scale(1.12); }
+    }
+    @keyframes auroraFloat2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-40px, -25px) scale(1.08); }
+    }
     .glass-bar {
       background: rgba(10, 12, 22, 0.78);
       backdrop-filter: blur(26px) saturate(180%);
@@ -81,9 +92,39 @@
       border-color: rgba(96, 165, 250, 0.55);
       box-shadow: 0 24px 50px -12px rgba(37, 99, 235, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
     }
+    .poster-card:active { transform: scale(0.96); }
     .eco-switch .poster-card:hover {
       border-color: rgba(251, 113, 133, 0.55);
       box-shadow: 0 24px 50px -12px rgba(225, 29, 72, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+    @keyframes cardEnter {
+      from { opacity: 0; transform: translateY(16px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .card-stagger {
+      animation: cardEnter 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: calc(var(--i, 0) * 32ms);
+    }
+    @keyframes holoSweep {
+      0% { transform: translateX(-160%) rotate(25deg); }
+      35%, 100% { transform: translateX(260%) rotate(25deg); }
+    }
+    .plat-holo::after {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      width: 45%;
+      background: linear-gradient(90deg, transparent, rgba(186, 230, 253, 0.28), rgba(255, 255, 255, 0.45), transparent);
+      transform: translateX(-160%) rotate(25deg);
+      animation: holoSweep 5.5s ease-in-out infinite;
+      pointer-events: none;
+    }
+    #detailDrawer { transition: opacity 0.25s ease; }
+    #detailDrawer.drawer-closed { opacity: 0; pointer-events: none; }
+    #detailDrawerPanel { transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1); }
+    #detailDrawer.drawer-closed #detailDrawerPanel { transform: translateY(100%); }
+    @media (min-width: 640px) {
+      #detailDrawer.drawer-closed #detailDrawerPanel { transform: translateX(100%); }
     }
     .museum-hall {
       background:
@@ -444,8 +485,8 @@
     </button>
   </nav>
 
-  <div id="detailDrawer" onclick="if(event.target===this) closeDrawer()" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex justify-end">
-    <div class="w-full max-w-full sm:max-w-xl bg-[#090b12] sm:border-l border-white/10 h-[100dvh] flex flex-col shadow-2xl">
+  <div id="detailDrawer" onclick="if(event.target===this) closeDrawer()" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden drawer-closed flex items-end sm:items-stretch justify-end">
+    <div id="detailDrawerPanel" class="w-full max-w-full sm:max-w-xl bg-[#090b12] sm:border-l border-t sm:border-t-0 border-white/10 rounded-t-3xl sm:rounded-none h-[92dvh] sm:h-[100dvh] flex flex-col shadow-2xl overflow-hidden">
       <div class="relative p-5 sm:p-6 border-b border-white/10 overflow-hidden shrink-0" style="padding-top: calc(1.25rem + env(safe-area-inset-top));">
         <div id="d-bg-blur" class="absolute inset-0 bg-cover bg-center opacity-30 blur-2xl scale-125 pointer-events-none"></div>
         <div class="relative flex items-start justify-between gap-3">
@@ -616,7 +657,6 @@
       }
     };
 
-    // REEMPLAZA SOLO ESTA LINEA CON TU URL /exec DE GOOGLE APPS SCRIPT
     var API_URL = 'https://script.google.com/macros/s/AKfycbzBXQnyg0p0FShNtsG9YUWHNWI8SfVuLbypxJO_yxUcZw6ELPL-cD0R2brV5zGUYFqw0Q/exec';
 
     function callApi(action, args, onOk, onErr) {
@@ -737,15 +777,9 @@
       document.getElementById('svg-s').innerHTML = trophySvg('silver', 'w-4 h-4');
       document.getElementById('svg-b').innerHTML = trophySvg('bronze', 'w-4 h-4');
 
-      if (!API_URL || API_URL === 'PEGA_AQUI_TU_URL_EXEC') {
-        document.getElementById('initial-loader').innerHTML =
-          '<div class="max-w-md rounded-2xl bg-amber-950/70 border border-amber-500/40 p-4 text-xs text-amber-200 leading-relaxed"><b>Falta configurar API_URL:</b> abre <code>index.html</code>, busca <code>PEGA_AQUI_TU_URL_EXEC</code> y pega tu enlace <code>/exec</code> de Google Apps Script.</div>';
-        return;
-      }
-
       var loadTimer = setTimeout(function() {
         var ls = document.getElementById('loader-status');
-        if (ls) ls.innerText = 'Conectando con Google Apps Script... verifica que doPost() este publicado para Cualquier persona.';
+        if (ls) ls.innerText = 'Conectando con Google Apps Script...';
       }, 10000);
 
       callApi('getInitialData', [], function(data) {
@@ -1005,13 +1039,16 @@
       renderMuseum();
     }
 
-    function posterCardHtml(g, widthClass) {
+    function posterCardHtml(g, widthClass, idx) {
       var wc = widthClass || '';
+      var isDone = g.status === 'Platinado' || g.status === '100% Completado';
+      var holoCls = isDone ? ' plat-holo' : '';
+      var staggerStyle = typeof idx === 'number' ? ' style="--i:' + Math.min(idx, 18) + '"' : '';
       var barColor = g.progress >= 100 ? 'bg-emerald-400' : (isSwitch(g) ? 'bg-rose-500' : 'bg-sky-400');
       var progBadge = g.progress > 0
         ? '<span class="absolute top-2.5 right-2.5 bg-black/65 backdrop-blur-md font-mono text-[10px] font-bold px-2 py-0.5 rounded-md ' + (g.progress >= 100 ? 'text-emerald-400' : 'text-sky-300') + ' border border-white/15">' + g.progress + '%</span>'
         : '';
-      return '<div onclick="openDrawer(\'' + g.id + '\')" class="' + wc + ' poster-card cursor-pointer group flex flex-col">' +
+      return '<div onclick="openDrawer(\'' + g.id + '\')"' + staggerStyle + ' class="' + wc + ' poster-card card-stagger' + holoCls + ' cursor-pointer group flex flex-col">' +
         '<div class="relative aspect-[2/3] bg-black overflow-hidden">' +
         renderCover(g, 'w-full h-full group-hover:scale-105 transition duration-500') +
         '<div class="absolute inset-0 bg-gradient-to-t from-[#070910] via-black/15 to-black/30"></div>' +
@@ -1086,7 +1123,7 @@
         .sort(function(a, b) { return b.progress - a.progress; })
         .slice(0, 12);
       document.getElementById('shelf-closest').innerHTML = closest.length
-        ? closest.map(function(g) { return posterCardHtml(g, 'w-36 sm:w-44 shrink-0'); }).join('')
+        ? closest.map(function(g, idx) { return posterCardHtml(g, 'w-36 sm:w-44 shrink-0', idx); }).join('')
         : '<p class="text-xs text-slate-500 px-1">Aun no hay juegos empezados.</p>';
 
       var shorts = pending
@@ -1094,7 +1131,7 @@
         .sort(function(a, b) { return a.duration - b.duration; })
         .slice(0, 12);
       document.getElementById('shelf-short').innerHTML = shorts.length
-        ? shorts.map(function(g) { return posterCardHtml(g, 'w-36 sm:w-44 shrink-0'); }).join('')
+        ? shorts.map(function(g, idx) { return posterCardHtml(g, 'w-36 sm:w-44 shrink-0', idx); }).join('')
         : '<p class="text-xs text-slate-500 px-1">No hay juegos cortos pendientes.</p>';
     }
 
@@ -1142,7 +1179,7 @@
         grid.innerHTML = '<div class="col-span-full py-16 text-center text-xs text-slate-500">No hay juegos en "' + STATUS_LABELS[currentStatusTab] + '".</div>';
         return;
       }
-      grid.innerHTML = slice.map(function(g) { return posterCardHtml(g, ''); }).join('');
+      grid.innerHTML = slice.map(function(g, idx) { return posterCardHtml(g, '', idx); }).join('');
     }
 
     function setMuseumFilter(f) {
@@ -1206,7 +1243,7 @@
           var sw = isSwitch(g);
           var frameCls = sw ? 'pedestal-crimson' : (g.difficulty >= 8 ? 'pedestal-diamond' : 'pedestal-gold');
           var rankColor = sw ? 'text-rose-300' : (g.difficulty >= 8 ? 'text-purple-300' : 'text-amber-300');
-          return '<div onclick="openDrawer(\'' + g.id + '\')" class="' + frameCls + ' rounded-2xl overflow-hidden bg-[#0a0c14] cursor-pointer group transition hover:-translate-y-1.5 flex flex-col">' +
+          return '<div onclick="openDrawer(\'' + g.id + '\')" class="' + frameCls + ' plat-holo relative rounded-2xl overflow-hidden bg-[#0a0c14] cursor-pointer group transition hover:-translate-y-1.5 flex flex-col">' +
             '<div class="relative aspect-[2/3] bg-black overflow-hidden">' +
             renderCover(g, 'w-full h-full group-hover:scale-105 transition duration-700') +
             '<div class="absolute inset-0 bg-gradient-to-t from-[#0a0c14] via-transparent to-black/40"></div>' +
@@ -1281,10 +1318,10 @@
         return;
       }
 
-      wall.innerHTML = pieces.map(function(g) {
+      wall.innerHTML = pieces.map(function(g, idx) {
         var sw = isSwitch(g);
         var num = String(g.museumNum).padStart(2, '0');
-        return '<div onclick="openDrawer(\'' + g.id + '\')" class="poster-card cursor-pointer group">' +
+        return '<div onclick="openDrawer(\'' + g.id + '\')" style="--i:' + Math.min(idx, 18) + '" class="poster-card card-stagger plat-holo cursor-pointer group">' +
           '<div class="relative aspect-[2/3] bg-black overflow-hidden">' +
           renderCover(g, 'w-full h-full group-hover:scale-105 transition duration-500') +
           '<div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent"></div>' +
@@ -1345,12 +1382,21 @@
       var tab = defaultTab || 'info';
       var initialTab = (sw && tab === 'trophies') ? 'briefing' : tab;
       switchDrawerTab(initialTab);
-      document.getElementById('detailDrawer').classList.remove('hidden');
+
+      var drawer = document.getElementById('detailDrawer');
+      drawer.classList.remove('hidden');
+      requestAnimationFrame(function() {
+        drawer.classList.remove('drawer-closed');
+      });
     }
 
     function closeDrawer() {
-      document.getElementById('detailDrawer').classList.add('hidden');
-      activeGameId = null;
+      var drawer = document.getElementById('detailDrawer');
+      drawer.classList.add('drawer-closed');
+      setTimeout(function() {
+        drawer.classList.add('hidden');
+        activeGameId = null;
+      }, 280);
     }
 
     function renderDrawerStatusButtons(g) {
@@ -1363,18 +1409,30 @@
       }).join('');
     }
 
+    function triggerPlatCelebration(isSw) {
+      if (typeof confetti !== 'function') return;
+      var colors = isSw ? ['#fb7185', '#f97316', '#fde047', '#ffffff'] : ['#38bdf8', '#818cf8', '#e0f2fe', '#fbbf24'];
+      confetti({ particleCount: 75, spread: 70, origin: { y: 0.65 }, colors: colors });
+      setTimeout(function() {
+        confetti({ particleCount: 45, angle: 60, spread: 55, origin: { x: 0 }, colors: colors });
+        confetti({ particleCount: 45, angle: 120, spread: 55, origin: { x: 1 }, colors: colors });
+      }, 180);
+    }
+
     function changeDrawerStatus(st) {
       var g = allGames.find(function(x) { return String(x.id) === String(activeGameId); });
       if (!g) return;
+      var prevStatus = g.status;
       g.status = st;
       if (st === 'Platinado' || st === '100% Completado') {
         g.progress = 100;
         document.getElementById('d-prog-slider').value = 100;
         document.getElementById('d-prog-label').innerText = '100%';
+        if (prevStatus !== st) triggerPlatCelebration(isSwitch(g));
       }
       renderDrawerStatusButtons(g);
       renderAll();
-      notify('Estado actualizado');
+      notify(st === 'Platinado' ? 'Platino desbloqueado!' : 'Estado actualizado');
       callApi('updateGameField', [g.id, { status: st, progress: g.progress }], null, function(err) {
         notify(err.message || 'Error guardando estado', true);
       });
