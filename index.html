@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PlatDex">
+  <meta name="theme-color" content="#04050a">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <link rel="icon" type="image/png" href="icon-512.png">
+  <title>PlatDex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root { --bg: #04050a; }
+    * { box-sizing: border-box; }
+    html {
+      height: 100%;
+      overflow-x: clip;
+      overflow-y: auto;
+      overscroll-behavior-x: none;
+      -webkit-text-size-adjust: 100%;
+      background-color: var(--bg);
+    }
+    body {
+      min-height: 100%;
+      width: 100%;
+      overflow-x: clip;
+      overflow-y: visible;
+      touch-action: pan-y;
+      background-color: var(--bg);
+      color: #f8fafc;
+      font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+    }
+    .font-display { font-family: "Cinzel", Georgia, serif; }
+    .font-mono { font-family: "JetBrains Mono", monospace; }
+    button, a, [onclick] { touch-action: manipulation; }
+    @media (max-width: 768px) {
+      input, select, textarea { font-size: 16px !important; }
+    }
+    .aurora {
+      position: fixed; inset: 0; width: 100vw; max-width: 100%;
+      z-index: -1; pointer-events: none; overflow: hidden;
+    }
+    .aurora-orb-1, .aurora-orb-2 {
+      position: absolute; border-radius: 9999px; filter: blur(110px); opacity: 0.42;
+      transition: background 0.7s ease;
+    }
+    .aurora-orb-1 {
+      width: 680px; height: 420px; top: -180px; left: 10%;
+      background: radial-gradient(circle, #2563eb 0%, #4f46e5 55%, transparent 100%);
+    }
+    .aurora-orb-2 {
+      width: 520px; height: 380px; top: 80px; right: -120px;
+      background: radial-gradient(circle, #06b6d4 0%, #7c3aed 60%, transparent 100%);
+      opacity: 0.25;
+    }
+    .eco-switch .aurora-orb-1 { background: radial-gradient(circle, #e11d48 0%, #be123c 55%, transparent 100%); }
+    .eco-switch .aurora-orb-2 { background: radial-gradient(circle, #f97316 0%, #db2777 60%, transparent 100%); }
+    .glass-bar {
+      background: rgba(10, 12, 22, 0.78);
+      backdrop-filter: blur(26px) saturate(180%);
+      -webkit-backdrop-filter: blur(26px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      box-shadow: 0 18px 40px -15px rgba(0, 0, 0, 0.75);
+    }
+    .poster-card {
+      position: relative; border-radius: 18px; overflow: hidden;
+      background: #0d1019; border: 1px solid rgba(255, 255, 255, 0.09);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.28s ease, box-shadow 0.28s ease;
+    }
+    .poster-card:hover {
+      transform: translateY(-6px) scale(1.015);
+      border-color: rgba(96, 165, 250, 0.55);
+      box-shadow: 0 24px 50px -12px rgba(37, 99, 235, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+    .eco-switch .poster-card:hover {
+      border-color: rgba(251, 113, 133, 0.55);
+      box-shadow: 0 24px 50px -12px rgba(225, 29, 72, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+    .museum-hall {
+      background:
+        radial-gradient(ellipse 75% 50% at 50% -10%, rgba(250, 204, 21, 0.18), transparent 70%),
+        linear-gradient(180deg, rgba(17, 20, 32, 0.92) 0%, rgba(7, 9, 15, 0.98) 100%);
+      border: 1px solid rgba(253, 224, 71, 0.2);
+    }
+    .pedestal-diamond { border: 1px solid rgba(192, 132, 252, 0.55); box-shadow: 0 0 40px -10px rgba(168, 85, 247, 0.45); }
+    .pedestal-gold { border: 1px solid rgba(250, 204, 21, 0.48); box-shadow: 0 0 40px -10px rgba(234, 179, 8, 0.35); }
+    .pedestal-crimson { border: 1px solid rgba(251, 113, 133, 0.55); box-shadow: 0 0 40px -10px rgba(225, 29, 72, 0.42); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    input[type=range] { -webkit-appearance: none; background: transparent; }
+    input[type=range]::-webkit-slider-runnable-track { height: 6px; border-radius: 999px; background: rgba(255,255,255,0.14); }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%;
+      background: #fff; margin-top: -7px; box-shadow: 0 0 12px rgba(56,189,248,0.65); cursor: pointer;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade { animation: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  </style>
+</head>
+<body class="min-h-screen md:pb-16">
+  <div class="aurora">
+    <div class="aurora-orb-1"></div>
+    <div class="aurora-orb-2"></div>
+  </div>
+
+  <header class="sticky top-0 z-40 px-3 sm:px-4 pt-3 pb-2" style="padding-top: calc(0.75rem + env(safe-area-inset-top));">
+    <div class="max-w-7xl mx-auto glass-bar rounded-2xl px-3 md:px-5 py-2.5 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <button type="button" onclick="switchView('overview')" class="flex items-center gap-2 shrink-0">
+          <div id="brand-icon" class="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 border border-sky-400/40 flex items-center justify-center shadow-lg shadow-sky-500/30 transition">
+            <svg class="w-5 h-5" viewBox="0 0 64 64" fill="none">
+              <defs>
+                <linearGradient id="platGrad" x1="12" y1="6" x2="52" y2="58" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#e0f2fe"/>
+                  <stop offset="45%" stop-color="#38bdf8"/>
+                  <stop offset="100%" stop-color="#6366f1"/>
+                </linearGradient>
+              </defs>
+              <path d="M12 14L14 10L16 14L20 16L16 18L14 22L12 18L8 16L12 14Z" fill="#bae6fd"/>
+              <path d="M51 10L52.5 7L54 10L57 11.5L54 13L52.5 16L51 13L48 11.5L51 10Z" fill="#7dd3fc"/>
+              <path d="M18 12H46V24C46 33 40 39 32 40C24 39 18 33 18 24V12Z" fill="url(#platGrad)"/>
+              <path d="M18 16H11C11 25 14 30 20 31" stroke="#7dd3fc" stroke-width="3.5" stroke-linecap="round"/>
+              <path d="M46 16H53C53 25 50 30 44 31" stroke="#7dd3fc" stroke-width="3.5" stroke-linecap="round"/>
+              <path d="M29 39H35V49H29V39Z" fill="#93c5fd"/>
+              <path d="M20 50C20 48.5 21.5 47 23 47H41C42.5 47 44 48.5 44 50V55H20V50Z" fill="url(#platGrad)"/>
+              <rect x="17" y="54" width="30" height="4" rx="2" fill="#e0f2fe"/>
+            </svg>
+          </div>
+          <div class="hidden sm:block text-left">
+            <p class="font-extrabold text-sm tracking-tight text-white leading-none">PlatDex</p>
+            <p class="text-[10px] text-slate-400 font-mono mt-0.5">lQuackBertol</p>
+          </div>
+        </button>
+
+        <div class="bg-white/[0.06] p-1 rounded-xl flex items-center border border-white/10 shrink-0">
+          <button type="button" id="eco-ps" onclick="setEcosystem('PS')" class="px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow transition">PS5 / PS4</button>
+          <button type="button" id="eco-sw" onclick="setEcosystem('Switch')" class="px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-bold text-slate-400 hover:text-white transition">Nintendo</button>
+        </div>
+      </div>
+
+      <nav class="hidden lg:flex items-center gap-1 bg-white/[0.04] p-1 rounded-xl border border-white/[0.06]">
+        <button type="button" id="nav-overview" onclick="switchView('overview')" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-white/15 text-white transition">Inicio</button>
+        <button type="button" id="nav-library" onclick="switchView('library')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">Biblioteca</button>
+        <button type="button" id="nav-profile" onclick="switchView('profile')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">Perfil</button>
+      </nav>
+
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <button type="button" id="btn-covers" onclick="runCoverBatch()" class="hidden items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold bg-gradient-to-r from-violet-600/30 to-fuchsia-600/30 hover:from-violet-600/50 hover:to-fuchsia-600/50 text-fuchsia-200 border border-fuchsia-400/30 transition">
+          <svg id="cover-spinner" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span id="btn-covers-text" class="hidden sm:inline">Caratulas</span>
+        </button>
+
+        <button type="button" onclick="triggerPsnSync()" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-400/25 transition">
+          <svg id="sync-spinner" class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <span class="hidden sm:inline">Sync PSN</span>
+        </button>
+
+        <button type="button" onclick="openAddModal()" class="flex items-center gap-1 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-white text-black hover:bg-slate-200 transition shadow-lg">
+          <span>+</span><span class="hidden sm:inline">Juego</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-3.5 md:px-6 pt-3 sm:pt-4">
+    <div id="initial-loader" class="py-28 flex flex-col items-center justify-center gap-3 text-center px-4">
+      <div class="w-10 h-10 rounded-full border-2 border-white/15 border-t-sky-400 animate-spin"></div>
+      <p id="loader-status" class="text-xs font-semibold text-slate-400 tracking-wide">Cargando PlatDex...</p>
+    </div>
+
+    <div id="app-views" class="hidden space-y-9">
+
+      <section id="view-overview" class="space-y-8 animate-fade">
+        <div id="hero-spotlight" class="relative rounded-[26px] overflow-hidden border border-white/15 min-h-[260px] md:min-h-[340px] flex items-end shadow-2xl"></div>
+
+        <div class="relative rounded-3xl overflow-hidden border border-indigo-400/25 bg-gradient-to-br from-indigo-950/60 via-[#0d1020]/90 to-sky-950/45 p-4 md:p-6 shadow-xl space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+              <span class="text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-full bg-indigo-500/25 text-indigo-200 border border-indigo-400/30">Copiloto Gemini</span>
+              <p class="text-xs text-slate-300 hidden sm:inline">Busca por antojo, frena compras impulsivas o elige tu proximo reto</p>
+            </div>
+            <div class="flex bg-black/40 p-1 rounded-full border border-white/10 self-start md:self-auto">
+              <button type="button" id="aitab-mood" onclick="switchAiTool('mood')" class="px-3 py-1.5 rounded-full text-xs font-bold bg-white text-black transition">Antojo</button>
+              <button type="button" id="aitab-buy" onclick="switchAiTool('buy')" class="px-3 py-1.5 rounded-full text-xs font-bold text-slate-300 hover:text-white transition">Lo compro?</button>
+              <button type="button" id="aitab-next" onclick="switchAiTool('next')" class="px-3 py-1.5 rounded-full text-xs font-bold text-slate-300 hover:text-white transition">Que sigue?</button>
+            </div>
+          </div>
+
+          <div id="aipanel-mood" class="space-y-3">
+            <form onsubmit="runMoodSearch(event)" class="flex flex-col sm:flex-row gap-2.5">
+              <input type="text" id="mood-input" placeholder="Ej. Terror corto sin online, o un reto parecido a Hollow Knight..." class="flex-1 bg-black/45 border border-white/15 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-sky-400">
+              <button type="submit" id="btn-mood-go" class="shrink-0 px-6 py-3 rounded-2xl text-xs font-extrabold bg-gradient-to-r from-indigo-500 to-sky-500 hover:from-indigo-400 hover:to-sky-400 text-white shadow-lg transition">Buscar en mi backlog</button>
+            </form>
+            <div class="flex flex-wrap gap-1.5">
+              <button type="button" onclick="quickMood('Algo corto y relajado para desconectarme')" class="text-[11px] font-semibold px-3 py-1 rounded-full bg-white/[0.06] hover:bg-white/15 text-slate-300 border border-white/10 transition">Corto y relajado</button>
+              <button type="button" onclick="quickMood('Un reto exigente con buen combate')" class="text-[11px] font-semibold px-3 py-1 rounded-full bg-white/[0.06] hover:bg-white/15 text-slate-300 border border-white/10 transition">Reto exigente</button>
+              <button type="button" onclick="quickMood('Terror o suspenso sin trofeos online')" class="text-[11px] font-semibold px-3 py-1 rounded-full bg-white/[0.06] hover:bg-white/15 text-slate-300 border border-white/10 transition">Terror offline</button>
+              <button type="button" onclick="quickMood('Un juego con gran historia que ya tenga empezado o corto')" class="text-[11px] font-semibold px-3 py-1 rounded-full bg-white/[0.06] hover:bg-white/15 text-slate-300 border border-white/10 transition">Gran historia</button>
+            </div>
+            <div id="mood-results" class="hidden space-y-3 pt-1"></div>
+          </div>
+
+          <div id="aipanel-buy" class="hidden space-y-3">
+            <form onsubmit="runBuyCheck(event)" class="flex flex-col sm:flex-row gap-2.5">
+              <input type="text" id="buy-title" placeholder="Juego en oferta (ej. Lies of P, Hades II...)" class="flex-1 bg-black/45 border border-white/15 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-400">
+              <input type="text" id="buy-price" placeholder="Precio (opcional)" class="sm:w-48 bg-black/45 border border-white/15 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-400">
+              <button type="submit" id="btn-buy-go" class="shrink-0 px-6 py-3 rounded-2xl text-xs font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black shadow-lg transition">Evaluar compra</button>
+            </form>
+            <div id="buy-results" class="hidden pt-1"></div>
+          </div>
+
+          <div id="aipanel-next" class="hidden space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <p class="text-xs text-slate-300">Cruza tus ultimos logros contra tu backlog actual y te propone 3 caminos listos para arrancar.</p>
+              <button type="button" id="btn-ai-rec" onclick="runAiRecommender()" class="shrink-0 px-5 py-2.5 rounded-full text-xs font-extrabold bg-white text-black hover:bg-slate-200 transition shadow-lg">Elegir 3 juegos con IA</button>
+            </div>
+            <div id="ai-rec-results" class="hidden grid grid-cols-1 md:grid-cols-3 gap-3.5"></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div onclick="openLibTab(ecosystem === 'PS' ? 'Platinado' : '100% Completado')" class="cursor-pointer rounded-2xl bg-gradient-to-br from-sky-500/15 to-white/[0.02] hover:from-sky-500/25 border border-sky-400/20 p-4 transition">
+            <p id="kpi-1-lbl" class="text-[11px] font-bold uppercase tracking-wider text-sky-300">Platinos PS</p>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span id="kpi-1-val" class="text-2xl sm:text-3xl font-extrabold text-white">0</span>
+              <span id="kpi-1-sub" class="text-[11px] text-slate-400 truncate"></span>
+            </div>
+          </div>
+          <div onclick="openLibTab('100% Completado')" class="cursor-pointer rounded-2xl bg-gradient-to-br from-emerald-500/15 to-white/[0.02] hover:from-emerald-500/25 border border-emerald-400/20 p-4 transition">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-emerald-300">Al 100%</p>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span id="kpi-2-val" class="text-2xl sm:text-3xl font-extrabold text-white">0</span>
+              <span class="text-[11px] text-slate-400">completos</span>
+            </div>
+          </div>
+          <div onclick="openLibTab('Pendiente')" class="cursor-pointer rounded-2xl bg-gradient-to-br from-indigo-500/15 to-white/[0.02] hover:from-indigo-500/25 border border-indigo-400/20 p-4 transition">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-indigo-300">Backlog</p>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span id="kpi-3-val" class="text-2xl sm:text-3xl font-extrabold text-white">0</span>
+              <span id="kpi-3-sub" class="text-[11px] text-slate-400">0h</span>
+            </div>
+          </div>
+          <div onclick="openLibTab('Abandonado')" class="cursor-pointer rounded-2xl bg-gradient-to-br from-rose-500/10 to-white/[0.02] hover:from-rose-500/20 border border-white/10 p-4 transition">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-300">Historia / Drop</p>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span id="kpi-4-val" class="text-2xl sm:text-3xl font-extrabold text-white">0 / 0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-end justify-between px-1">
+            <div>
+              <h3 class="text-lg font-extrabold text-white tracking-tight">A punto de caer</h3>
+              <p class="text-xs text-slate-400">Tus juegos pendientes con mayor porcentaje avanzado</p>
+            </div>
+            <button type="button" onclick="openLibTab('Pendiente', 'progress')" class="text-xs font-bold text-sky-400 hover:text-sky-300 shrink-0">Ver todos &rarr;</button>
+          </div>
+          <div id="shelf-closest" class="flex gap-3.5 overflow-x-auto no-scrollbar pb-2" style="touch-action: pan-x pan-y;"></div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="flex items-end justify-between px-1">
+            <div>
+              <h3 class="text-lg font-extrabold text-white tracking-tight">Joyas rapidas (&le; 15h)</h3>
+              <p class="text-xs text-slate-400">Ideales para liquidar en un fin de semana</p>
+            </div>
+            <button type="button" onclick="openLibTab('Pendiente', 'short')" class="text-xs font-bold text-sky-400 hover:text-sky-300 shrink-0">Ver todos &rarr;</button>
+          </div>
+          <div id="shelf-short" class="flex gap-3.5 overflow-x-auto no-scrollbar pb-2" style="touch-action: pan-x pan-y;"></div>
+        </div>
+      </section>
+
+      <section id="view-library" class="hidden space-y-5 animate-fade">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3.5">
+          <div>
+            <h2 class="text-2xl font-extrabold text-white tracking-tight">Biblioteca</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Toca cualquier portada para ver su Briefing IA, trofeos reales o moverlo de estado</p>
+          </div>
+          <div class="flex items-center gap-2 w-full md:w-auto">
+            <div class="relative flex-1 md:w-64">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              <input type="text" id="libSearch" oninput="resetLibLimit()" placeholder="Buscar titulo..." class="w-full bg-white/[0.06] border border-white/10 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-sky-400">
+            </div>
+            <select id="libSort" onchange="resetLibLimit()" class="bg-white/[0.06] border border-white/10 rounded-xl px-3 py-2 text-xs font-semibold text-slate-200 focus:outline-none">
+              <option value="default" class="bg-[#0d1017]">Original</option>
+              <option value="progress" class="bg-[#0d1017]">Avance</option>
+              <option value="short" class="bg-[#0d1017]">Mas cortos</option>
+              <option value="hard" class="bg-[#0d1017]">Dificiles</option>
+              <option value="alpha" class="bg-[#0d1017]">A - Z</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1" style="touch-action: pan-x pan-y;">
+          <button type="button" onclick="setStatusTab('Pendiente')" id="stab-Pendiente" class="shrink-0 px-4 py-2 rounded-full text-xs font-bold transition"></button>
+          <button type="button" onclick="setStatusTab('Jugando')" id="stab-Jugando" class="shrink-0 px-4 py-2 rounded-full text-xs font-bold transition"></button>
+          <button type="button" onclick="setStatusTab('Platinado')" id="stab-Platinado" class="shrink-0 px-4 py-2 rounded-full text-xs font-bold transition"></button>
+          <button type="button" onclick="setStatusTab('100% Completado')" id="stab-100% Completado" class="shrink-0 px-4 py-2 rounded-full text-xs font-bold transition"></button>
+          <button type="button" onclick="setStatusTab('Completado')" id="stab-Completado" class="shrink-0 px-4 py-2 rounded-full text-xs font-bold transition"></button>
+          <button type="button" onclick="setStatusTab('Abandonado')" id="stab-Abandonado" class="shrink-0 px-4 py-2 rounded-full text-xs font-bold transition"></button>
+        </div>
+
+        <div id="lib-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 md:gap-5"></div>
+        <div id="lib-load-more" class="hidden text-center pt-4">
+          <button type="button" onclick="loadMoreLib()" class="px-6 py-2.5 rounded-full text-xs font-bold bg-white/10 hover:bg-white/20 text-white border border-white/15 transition">Cargar mas (<span id="lib-rem">0</span> restantes)</button>
+        </div>
+      </section>
+
+      <section id="view-profile" class="hidden space-y-8 animate-fade">
+        <div class="museum-hall rounded-[28px] p-5 md:p-9 shadow-2xl relative overflow-hidden space-y-6">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="flex items-center gap-4">
+              <div id="prof-avatar-wrap" class="w-16 h-16 md:w-20 md:h-20 rounded-full border-2 border-amber-300/60 overflow-hidden bg-black flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/20">
+                <span class="font-display text-lg font-bold text-amber-200">QB</span>
+              </div>
+              <div class="min-w-0">
+                <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-amber-300">Perfil Global &middot; PlatDex</p>
+                <h2 class="font-display text-2xl md:text-4xl font-bold text-white tracking-wide mt-0.5 truncate">lQuackBertol</h2>
+                <p id="museum-total-hours" class="text-xs text-slate-300 mt-1 font-mono">0 horas conquistadas</p>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2 shrink-0">
+              <div class="flex items-center justify-between sm:justify-start gap-4 bg-black/55 border border-white/15 rounded-2xl px-4 py-3.5 backdrop-blur-md">
+                <div>
+                  <p class="text-[10px] uppercase tracking-widest text-slate-400">Nivel PSN</p>
+                  <p id="live-level" class="text-2xl font-extrabold font-mono text-white">-</p>
+                </div>
+                <div class="h-9 w-px bg-white/15"></div>
+                <div class="grid grid-cols-4 gap-3 sm:gap-4">
+                  <div class="text-center"><div class="flex justify-center" id="svg-p"></div><span id="live-plat" class="font-mono text-xs font-bold text-white">-</span></div>
+                  <div class="text-center"><div class="flex justify-center" id="svg-g"></div><span id="live-gold" class="font-mono text-xs font-bold text-white">-</span></div>
+                  <div class="text-center"><div class="flex justify-center" id="svg-s"></div><span id="live-silver" class="font-mono text-xs font-bold text-white">-</span></div>
+                  <div class="text-center"><div class="flex justify-center" id="svg-b"></div><span id="live-bronze" class="font-mono text-xs font-bold text-white">-</span></div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-[11px] text-slate-400 px-1 font-mono">
+                <span id="u-trophies-total">Trofeos PSN: -</span>
+                <span id="museum-rate" class="text-emerald-400 font-bold">0% tasa global</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-white/10">
+            <div class="rounded-2xl bg-sky-500/10 border border-sky-400/25 p-3.5">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-sky-300">Platinos PlayStation</p>
+              <p id="u-plats" class="text-2xl md:text-3xl font-extrabold text-white font-mono mt-1">0</p>
+              <p id="u-plats-sub" class="text-[11px] text-slate-400 mt-0.5">PS5 / PS4</p>
+            </div>
+            <div class="rounded-2xl bg-rose-500/10 border border-rose-400/25 p-3.5">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-rose-300">Nintendo 100%</p>
+              <p id="u-sw100" class="text-2xl md:text-3xl font-extrabold text-white font-mono mt-1">0</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Switch / Switch 2</p>
+            </div>
+            <div class="rounded-2xl bg-purple-500/10 border border-purple-400/25 p-3.5">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-purple-300">Dificultad Extrema</p>
+              <p id="u-hard-count" class="text-2xl md:text-3xl font-extrabold text-white font-mono mt-1">0</p>
+              <p class="text-[11px] text-slate-400 mt-0.5">Retos Dif. 8-10</p>
+            </div>
+            <div class="rounded-2xl bg-emerald-500/10 border border-emerald-400/25 p-3.5">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-300">Total Conquistas</p>
+              <p id="u-total-done" class="text-2xl md:text-3xl font-extrabold text-white font-mono mt-1">0</p>
+              <p id="u-total-sub" class="text-[11px] text-slate-400 mt-0.5">PS + Nintendo</p>
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-white/10">
+            <div class="flex items-center justify-between gap-3">
+              <span id="curator-archetype" class="text-sm font-bold tracking-wide text-amber-200">Cazador de Platinos</span>
+              <button type="button" id="btn-curator" onclick="refreshCuratorPlaque()" class="text-[11px] font-bold text-amber-200 hover:text-black hover:bg-amber-300 px-3 py-1 rounded-full bg-amber-400/15 border border-amber-300/30 transition">Redactar placa IA</button>
+            </div>
+            <p id="curator-plaque" class="text-xs md:text-sm text-slate-300 mt-1.5 leading-relaxed">Presiona "Redactar placa IA" para que el curador analice tus conquistas y escriba el perfil oficial de tu galeria.</p>
+          </div>
+        </div>
+
+        <div id="masterpieces-section" class="space-y-4">
+          <div class="flex items-end justify-between border-b border-white/10 pb-3 px-1">
+            <div>
+              <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-amber-300">Salon de la Fama</p>
+              <h3 class="font-display text-xl md:text-2xl font-bold text-white mt-0.5">Tus Conquistas Mas Dificiles</h3>
+            </div>
+            <span class="text-xs text-slate-400 hidden sm:inline">Top global combinando PlayStation y Nintendo</span>
+          </div>
+          <div id="museum-pedestals" class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 md:gap-5"></div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-3 border-b border-white/10 pb-3 px-1">
+            <div>
+              <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sky-400">Coleccion Completa</p>
+              <h3 id="wall-title" class="font-display text-xl md:text-2xl font-bold text-white mt-0.5">Muro de Conquistas</h3>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <div class="flex bg-white/[0.06] p-1 rounded-full border border-white/10 text-[11px]">
+                <button type="button" id="meco-all" onclick="setMuseumFilter('all')" class="px-3 py-1 rounded-full font-bold bg-white text-black transition">Todos</button>
+                <button type="button" id="meco-PS" onclick="setMuseumFilter('PS')" class="px-3 py-1 rounded-full font-bold text-slate-300 hover:text-white transition">Platinos PS</button>
+                <button type="button" id="meco-Switch" onclick="setMuseumFilter('Switch')" class="px-3 py-1 rounded-full font-bold text-slate-300 hover:text-white transition">Nintendo 100%</button>
+              </div>
+              <input type="text" id="museumSearch" oninput="renderMuseumWall()" placeholder="Buscar..." class="bg-white/[0.06] border border-white/10 rounded-full px-3.5 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none w-36 sm:w-44">
+              <select id="museumSort" onchange="renderMuseumWall()" class="bg-white/[0.06] border border-white/10 rounded-full px-3 py-1.5 text-xs text-slate-200 focus:outline-none">
+                <option value="order" class="bg-[#0d1017]">Cronologico</option>
+                <option value="hard" class="bg-[#0d1017]">Mas dificiles</option>
+                <option value="hours" class="bg-[#0d1017]">Mas horas</option>
+              </select>
+            </div>
+          </div>
+          <div id="museum-wall" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5 md:gap-4"></div>
+        </div>
+
+        <div class="rounded-2xl bg-white/[0.03] border border-white/10 p-5 space-y-3">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-slate-200">Balance global (PlayStation + Nintendo)</span>
+            <span id="prof-sync-time" class="text-slate-400 font-mono text-[11px]"></span>
+          </div>
+          <div id="prof-dist-bar" class="w-full h-2.5 rounded-full overflow-hidden flex bg-white/[0.06] gap-[2px]"></div>
+          <div id="prof-dist-legend" class="flex flex-wrap gap-x-5 gap-y-1.5 text-[11px] text-slate-300"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <nav class="lg:hidden fixed bottom-3 left-3 right-3 z-40 glass-bar rounded-2xl grid grid-cols-3 py-2 text-center" style="margin-bottom: env(safe-area-inset-bottom);">
+    <button type="button" id="mnav-overview" onclick="switchView('overview')" class="text-white flex flex-col items-center gap-0.5">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <span class="text-[10px] font-bold">Inicio</span>
+    </button>
+    <button type="button" id="mnav-library" onclick="switchView('library')" class="text-slate-400 flex flex-col items-center gap-0.5">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+      <span class="text-[10px] font-bold">Biblioteca</span>
+    </button>
+    <button type="button" id="mnav-profile" onclick="switchView('profile')" class="text-slate-400 flex flex-col items-center gap-0.5">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+      <span class="text-[10px] font-bold">Perfil</span>
+    </button>
+  </nav>
+
+  <div id="detailDrawer" onclick="if(event.target===this) closeDrawer()" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex justify-end">
+    <div class="w-full max-w-full sm:max-w-xl bg-[#090b12] sm:border-l border-white/10 h-[100dvh] flex flex-col shadow-2xl">
+      <div class="relative p-5 sm:p-6 border-b border-white/10 overflow-hidden shrink-0" style="padding-top: calc(1.25rem + env(safe-area-inset-top));">
+        <div id="d-bg-blur" class="absolute inset-0 bg-cover bg-center opacity-30 blur-2xl scale-125 pointer-events-none"></div>
+        <div class="relative flex items-start justify-between gap-3">
+          <div class="flex items-center gap-3.5 min-w-0">
+            <div id="d-cover-wrap" class="w-14 sm:w-16 aspect-[2/3] rounded-xl overflow-hidden shrink-0 border border-white/20 shadow-xl bg-black"></div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span id="d-platform" class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-white/15 text-white">PS5</span>
+                <span id="d-alerts-badge" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-400/30 truncate"></span>
+              </div>
+              <h3 id="d-title" class="text-base sm:text-lg font-extrabold text-white leading-snug mt-1 line-clamp-2">Titulo</h3>
+              <p id="d-meta" class="text-xs text-slate-300 mt-0.5 font-mono">0% - 0h</p>
+            </div>
+          </div>
+          <button type="button" onclick="closeDrawer()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-xs text-white shrink-0 transition">X</button>
+        </div>
+
+        <div class="relative flex flex-wrap items-center justify-between gap-2 mt-4">
+          <div class="flex gap-1.5">
+            <button type="button" id="dtab-info" onclick="switchDrawerTab('info')" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-black transition">Detalles</button>
+            <button type="button" id="dtab-briefing" onclick="switchDrawerTab('briefing')" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white/10 text-slate-200 hover:bg-white/20 transition">Briefing IA</button>
+            <button type="button" id="dtab-trophies" onclick="switchDrawerTab('trophies')" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white/10 text-slate-200 hover:bg-white/20 transition">Trofeos PSN</button>
+          </div>
+          <button type="button" id="btn-reanalyze" onclick="reanalyzeActiveGame()" class="text-[11px] font-bold px-3 py-1.5 rounded-full bg-indigo-500/25 text-indigo-200 border border-indigo-400/35 hover:bg-indigo-500/40 transition">IA + Caratula</button>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
+        <div id="dpanel-info" class="space-y-5">
+          <div>
+            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Estado</p>
+            <div id="d-status-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+          </div>
+
+          <div class="rounded-2xl bg-white/[0.04] border border-white/10 p-4">
+            <div class="flex justify-between text-xs mb-2">
+              <span class="text-slate-300 font-semibold">Progreso</span>
+              <span id="d-prog-label" class="font-mono font-bold text-sky-400">0%</span>
+            </div>
+            <input type="range" id="d-prog-slider" min="0" max="100" value="0" oninput="document.getElementById('d-prog-label').innerText=this.value+'%'" onchange="saveDrawerProgress()" class="w-full">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1.5">Horas</label>
+              <input type="number" id="d-duration" class="w-full bg-white/[0.06] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white">
+            </div>
+            <div>
+              <label class="text-[11px] text-slate-400 block mb-1.5">Dificultad (1-10)</label>
+              <input type="number" id="d-difficulty" min="1" max="10" class="w-full bg-white/[0.06] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs font-mono text-white">
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1.5">Veredicto &amp; Alertas</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input type="text" id="d-worth" placeholder="Veredicto..." class="w-full bg-white/[0.06] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white">
+              <input type="text" id="d-alerts" placeholder="Perdibles, Online..." class="w-full bg-white/[0.06] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white">
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1.5">Notas / Resumen</label>
+            <textarea id="d-notes" rows="3" class="w-full bg-white/[0.06] border border-white/10 rounded-xl p-3.5 text-xs text-white"></textarea>
+          </div>
+
+          <div>
+            <label class="text-[11px] text-slate-400 block mb-1.5">URL de portada personalizada</label>
+            <input type="url" id="d-cover-url" placeholder="https://..." class="w-full bg-white/[0.06] border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white">
+          </div>
+
+          <div class="flex items-center justify-between pt-3 border-t border-white/10 pb-4">
+            <button type="button" onclick="deleteActiveGame()" class="text-xs font-bold text-rose-400 hover:text-rose-300 px-3 py-2 rounded-xl hover:bg-rose-500/10 transition">Eliminar</button>
+            <button type="button" onclick="saveDrawerDetails()" class="text-xs font-extrabold bg-white text-black hover:bg-slate-200 px-6 py-2.5 rounded-full transition">Guardar</button>
+          </div>
+        </div>
+
+        <div id="dpanel-briefing" class="hidden space-y-4">
+          <div id="briefing-empty" class="rounded-2xl bg-white/[0.04] border border-white/10 p-6 text-center space-y-3">
+            <p class="text-sm font-bold text-white">Briefing tactico antes de empezar</p>
+            <p class="text-xs text-slate-400 leading-relaxed">Gemini revisa cuantas partidas pide, requisitos de dificultad, perdibles clave (sin spoilers) y el mejor consejo de arranque. Se guarda permanente en tu hoja.</p>
+            <button type="button" id="btn-gen-briefing" onclick="loadBriefingAI(false)" class="px-5 py-2.5 rounded-full text-xs font-extrabold bg-gradient-to-r from-indigo-500 to-sky-500 text-white shadow-lg transition">Generar Briefing sin spoilers</button>
+          </div>
+
+          <div id="briefing-loader" class="hidden py-14 text-center">
+            <div class="inline-block w-6 h-6 border-2 border-white/20 border-t-indigo-400 rounded-full animate-spin mb-2"></div>
+            <p class="text-xs text-slate-400">Preparando ficha tactica sin spoilers...</p>
+          </div>
+
+          <div id="briefing-content" class="hidden space-y-3"></div>
+        </div>
+
+        <div id="dpanel-trophies" class="hidden space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex bg-white/[0.06] p-1 rounded-full border border-white/10 text-xs">
+              <button type="button" id="tf-missing" onclick="setTrophyFilter('missing')" class="px-3.5 py-1 rounded-full font-bold bg-white text-black transition">Faltantes</button>
+              <button type="button" id="tf-earned" onclick="setTrophyFilter('earned')" class="px-3.5 py-1 rounded-full font-bold text-slate-400 hover:text-white transition">Obtenidos</button>
+              <button type="button" id="tf-all" onclick="setTrophyFilter('all')" class="px-3.5 py-1 rounded-full font-bold text-slate-400 hover:text-white transition">Todos</button>
+            </div>
+            <div class="flex items-center gap-2">
+              <span id="trophy-count-badge" class="text-xs font-mono text-slate-300"></span>
+              <button type="button" id="btn-trophy-ai" onclick="analyzeMissingTrophiesAI()" class="hidden text-[11px] font-bold px-3 py-1 rounded-full bg-indigo-500/25 text-indigo-200 border border-indigo-400/35 hover:bg-indigo-500/40 transition">Estrategia IA</button>
+            </div>
+          </div>
+
+          <div id="trophy-ai-box" class="hidden rounded-2xl bg-indigo-950/50 border border-indigo-400/30 p-4 space-y-2.5 text-xs"></div>
+
+          <div id="trophy-loader" class="hidden py-14 text-center">
+            <div class="inline-block w-6 h-6 border-2 border-white/20 border-t-sky-400 rounded-full animate-spin mb-2"></div>
+            <p class="text-xs text-slate-400">Consultando trofeos en PlayStation...</p>
+          </div>
+          <div id="trophy-error" class="hidden p-4 rounded-2xl bg-rose-500/10 border border-rose-500/25 text-xs text-rose-300"></div>
+          <div id="trophy-list" class="space-y-2.5 pb-6"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="addModal" onclick="if(event.target===this) closeAddModal()" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-bar rounded-3xl w-full max-w-md p-6 space-y-5">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-extrabold text-white">Agregar juego</h3>
+        <button type="button" onclick="closeAddModal()" class="w-7 h-7 rounded-full bg-white/10 text-xs text-white">X</button>
+      </div>
+      <form id="addForm" onsubmit="submitNewGame(event)" class="space-y-4">
+        <div>
+          <label class="text-[11px] text-slate-300 block mb-1.5">Titulo</label>
+          <input type="text" id="new-title" required placeholder="Solo escribe el nombre..." class="w-full bg-white/[0.07] border border-white/15 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-sky-400">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[11px] text-slate-300 block mb-1.5">Consola</label>
+            <select id="new-platform" class="w-full bg-[#101320] border border-white/15 rounded-xl px-3 py-2.5 text-xs text-white">
+              <option value="PS5">PS5</option>
+              <option value="PS4">PS4</option>
+              <option value="Switch 2">Switch 2</option>
+              <option value="Switch">Switch</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-300 block mb-1.5">Estado</label>
+            <select id="new-status" class="w-full bg-[#101320] border border-white/15 rounded-xl px-3 py-2.5 text-xs text-white">
+              <option value="Pendiente">Pendiente</option>
+              <option value="Jugando">Jugando</option>
+              <option value="Platinado">Platinado</option>
+              <option value="100% Completado">Al 100%</option>
+              <option value="Completado">Solo Historia</option>
+              <option value="Abandonado">Abandonado</option>
+            </select>
+          </div>
+        </div>
+        <label class="flex items-center gap-2.5 bg-indigo-500/15 border border-indigo-400/30 rounded-xl p-3 cursor-pointer">
+          <input type="checkbox" id="new-use-ai" checked class="accent-indigo-500 w-4 h-4">
+          <span class="text-xs text-indigo-200 font-semibold">Autollenar horas, dificultad, alertas y caratula con IA</span>
+        </label>
+        <button type="submit" id="btn-submit-new" class="w-full bg-white hover:bg-slate-200 text-black font-extrabold py-3 rounded-full text-xs transition">Guardar juego</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="fixed bottom-24 md:bottom-6 right-4 z-50 glass-bar text-xs font-semibold text-white px-4 py-2.5 rounded-full hidden"></div>
+
+  <script>
+    window.onerror = function(msg, url, line) {
+      var el = document.getElementById('initial-loader');
+      if (el && !el.classList.contains('hidden')) {
+        el.innerHTML = '<div class="max-w-md rounded-2xl bg-rose-950/70 border border-rose-500/40 p-4 text-xs text-rose-200"><b>Error JS:</b> ' + msg + ' (linea ' + line + ')</div>';
+      }
+    };
+
+    // REEMPLAZA SOLO ESTA LINEA CON TU URL /exec DE GOOGLE APPS SCRIPT
+    var API_URL = 'https://script.google.com/macros/s/AKfycbzBXQnyg0p0FShNtsG9YUWHNWI8SfVuLbypxJO_yxUcZw6ELPL-cD0R2brV5zGUYFqw0Q/exec';
+
+    function callApi(action, args, onOk, onErr) {
+      fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: action, args: args || [] })
+      })
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function(res) {
+        if (!res || !res.ok) throw new Error((res && res.error) ? res.error : 'Error en servidor');
+        if (onOk) onOk(res.data);
+      })
+      .catch(function(err) {
+        if (onErr) onErr(err);
+      });
+    }
+
+    var allGames = [];
+    var psnProfile = null;
+    var curatorCache = { PS: null, Switch: null };
+    var ecosystem = 'PS';
+    var currentView = 'overview';
+    var currentStatusTab = 'Pendiente';
+    var museumEcoFilter = 'all';
+    var libLimit = 30;
+    var activeGameId = null;
+    var currentTrophies = [];
+    var trophyFilter = 'missing';
+    var trophyCache = {};
+    var coversRunning = false;
+
+    var STATUSES = ['Pendiente', 'Jugando', 'Platinado', '100% Completado', 'Completado', 'Abandonado'];
+    var STATUS_LABELS = {
+      'Pendiente': 'Pendientes',
+      'Jugando': 'Jugando',
+      'Platinado': 'Platinados',
+      '100% Completado': 'Al 100%',
+      'Completado': 'Solo Historia',
+      'Abandonado': 'Abandonados'
+    };
+
+    function trophySvg(type, size) {
+      var sz = size || 'w-4 h-4';
+      var colors = { platinum: '#38bdf8', gold: '#fbbf24', silver: '#e2e8f0', bronze: '#fb923c' };
+      return '<svg class="' + sz + '" viewBox="0 0 24 24" fill="' + (colors[type] || '#94a3b8') + '"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/></svg>';
+    }
+
+    function escHtml(s) {
+      return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function isSwitch(g) { return String(g.platform || '').toLowerCase().indexOf('switch') !== -1; }
+    function matchesEco(g) { return ecosystem === 'Switch' ? isSwitch(g) : !isSwitch(g); }
+
+    function cleanCoverUrl(g) {
+      if (!g || !g.cover || g.cover.indexOf('http') !== 0) return '';
+      if (g.cover.indexOf('mzstatic.com') !== -1) return '';
+      return g.cover.replace(
+        'https://cdn.akamai.steamstatic.com/steam/apps/',
+        'https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/'
+      );
+    }
+
+    function fallbackGradient(title, sw) {
+      var h = 0;
+      for (var i = 0; i < title.length; i++) h = title.charCodeAt(i) + ((h << 5) - h);
+      var psG = ['from-blue-900 via-indigo-950 to-slate-950', 'from-cyan-900 via-slate-900 to-indigo-950', 'from-violet-900 via-slate-900 to-blue-950'];
+      var swG = ['from-rose-900 via-red-950 to-slate-950', 'from-orange-900 via-rose-950 to-slate-950', 'from-pink-900 via-rose-950 to-slate-950'];
+      var arr = sw ? swG : psG;
+      return arr[Math.abs(h) % arr.length];
+    }
+
+    function fallbackCoverImg(img) {
+      if (img.src.indexOf('library_600x900.jpg') !== -1 && !img.dataset.retried) {
+        img.dataset.retried = '1';
+        img.src = img.src.replace('library_600x900.jpg', 'header.jpg');
+        return;
+      }
+      var div = document.createElement('div');
+      div.className = (img.dataset.cls || 'w-full h-full') + ' bg-gradient-to-br ' + (img.dataset.grad || 'from-slate-800 to-slate-950') + ' flex flex-col items-center justify-center p-3 text-center';
+      div.innerHTML = '<span class="text-xl font-extrabold text-white/30">' + (img.dataset.initials || 'G') + '</span>';
+      img.replaceWith(div);
+    }
+
+    function renderCover(g, cls) {
+      var c = cls || 'w-full h-full';
+      var url = cleanCoverUrl(g);
+      var grad = fallbackGradient(g.title || '', isSwitch(g));
+      var words = String(g.title || 'G').replace(/[^a-zA-Z0-9 ]/g, '').trim().split(/\s+/).slice(0, 2);
+      var initials = words.map(function(w) { return w ? w[0] : ''; }).join('').toUpperCase() || 'G';
+      if (url) {
+        return '<img src="' + escHtml(url) + '" alt="" loading="lazy" referrerpolicy="no-referrer" data-cls="' + c + '" data-grad="' + grad + '" data-initials="' + initials + '" onerror="fallbackCoverImg(this)" class="' + c + ' object-cover bg-black">';
+      }
+      return '<div class="' + c + ' bg-gradient-to-br ' + grad + ' flex flex-col items-center justify-center p-4 text-center">' +
+        '<span class="text-2xl font-extrabold tracking-widest text-white/25">' + initials + '</span>' +
+        '<span class="text-[11px] font-bold text-white/80 mt-2 line-clamp-2 leading-tight">' + escHtml(g.title) + '</span>' +
+        '</div>';
+    }
+
+    var toastT = null;
+    function notify(msg, isErr) {
+      var t = document.getElementById('toast');
+      t.innerText = msg;
+      t.className = 'fixed bottom-24 md:bottom-6 right-4 z-50 text-xs font-semibold px-4 py-2.5 rounded-full shadow-2xl ' +
+        (isErr ? 'bg-rose-950 border border-rose-500/40 text-rose-200' : 'glass-bar text-white');
+      t.classList.remove('hidden');
+      clearTimeout(toastT);
+      toastT = setTimeout(function() { t.classList.add('hidden'); }, isErr ? 5000 : 3000);
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('svg-p').innerHTML = trophySvg('platinum', 'w-4 h-4');
+      document.getElementById('svg-g').innerHTML = trophySvg('gold', 'w-4 h-4');
+      document.getElementById('svg-s').innerHTML = trophySvg('silver', 'w-4 h-4');
+      document.getElementById('svg-b').innerHTML = trophySvg('bronze', 'w-4 h-4');
+
+      if (!API_URL || API_URL === 'https://script.google.com/macros/s/AKfycbzBXQnyg0p0FShNtsG9YUWHNWI8SfVuLbypxJO_yxUcZw6ELPL-cD0R2brV5zGUYFqw0Q/exec') {
+        document.getElementById('initial-loader').innerHTML =
+          '<div class="max-w-md rounded-2xl bg-amber-950/70 border border-amber-500/40 p-4 text-xs text-amber-200 leading-relaxed"><b>Falta configurar API_URL:</b> abre <code>index.html</code>, busca <code>https://script.google.com/macros/s/AKfycbzBXQnyg0p0FShNtsG9YUWHNWI8SfVuLbypxJO_yxUcZw6ELPL-cD0R2brV5zGUYFqw0Q/exec</code>https://script.google.com/macros/s/AKfycbzBXQnyg0p0FShNtsG9YUWHNWI8SfVuLbypxJO_yxUcZw6ELPL-cD0R2brV5zGUYFqw0Q/exec<code>/exec</code> de Google Apps Script.</div>';
+        return;
+      }
+
+      var loadTimer = setTimeout(function() {
+        var ls = document.getElementById('loader-status');
+        if (ls) ls.innerText = 'Conectando con Google Apps Script... verifica que doPost() este publicado para Cualquier persona.';
+      }, 10000);
+
+      callApi('getInitialData', [], function(data) {
+        clearTimeout(loadTimer);
+        allGames = (data && Array.isArray(data.games)) ? data.games : [];
+        psnProfile = data ? data.psnProfile : null;
+        curatorCache.PS = data ? data.curatorPS : null;
+        curatorCache.Switch = data ? data.curatorSW : null;
+        document.getElementById('initial-loader').classList.add('hidden');
+        document.getElementById('app-views').classList.remove('hidden');
+        renderAll();
+      }, function(err) {
+        clearTimeout(loadTimer);
+        document.getElementById('initial-loader').innerHTML =
+          '<div class="max-w-md rounded-2xl bg-rose-950/70 border border-rose-500/40 p-4 text-xs text-rose-200 leading-relaxed"><b>Error de conexion:</b> ' + escHtml(err && err.message ? err.message : err) + '</div>';
+      });
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') { closeDrawer(); closeAddModal(); }
+    });
+    document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
+    document.addEventListener('gesturechange', function(e) { e.preventDefault(); });
+
+    function switchAiTool(tool) {
+      ['mood', 'buy', 'next'].forEach(function(t) {
+        var active = t === tool;
+        document.getElementById('aipanel-' + t).classList.toggle('hidden', !active);
+        document.getElementById('aitab-' + t).className = active
+          ? 'px-3 py-1.5 rounded-full text-xs font-bold bg-white text-black transition'
+          : 'px-3 py-1.5 rounded-full text-xs font-bold text-slate-300 hover:text-white transition';
+      });
+    }
+
+    function quickMood(text) {
+      document.getElementById('mood-input').value = text;
+      runMoodSearch();
+    }
+
+    function runMoodSearch(e) {
+      if (e) e.preventDefault();
+      var q = document.getElementById('mood-input').value.trim();
+      if (!q) return;
+      var btn = document.getElementById('btn-mood-go');
+      var box = document.getElementById('mood-results');
+      btn.disabled = true;
+      btn.innerText = 'Buscando...';
+      box.classList.add('hidden');
+
+      callApi('buscarPorAntojoIA', [q, ecosystem], function(res) {
+        btn.disabled = false;
+        btn.innerText = 'Buscar en mi backlog';
+        var matches = (res && res.matches) || [];
+        if (!matches.length) return notify('No encontre coincidencias claras para ese antojo.', true);
+
+        var cards = matches.map(function(m) {
+          var g = allGames.find(function(x) { return String(x.id) === String(m.id); });
+          if (!g) return '';
+          return '<div onclick="openDrawer(\'' + g.id + '\', \'briefing\')" class="cursor-pointer rounded-2xl bg-black/55 hover:bg-black/75 border border-white/15 p-3.5 flex items-center gap-3.5 transition hover:-translate-y-1">' +
+            '<div class="w-12 aspect-[2/3] rounded-xl overflow-hidden shrink-0 border border-white/15 bg-black">' + renderCover(g, 'w-full h-full') + '</div>' +
+            '<div class="min-w-0">' +
+            '<span class="text-[10px] font-extrabold uppercase tracking-wider text-sky-300">' + escHtml(m.badge || g.platform) + '</span>' +
+            '<h4 class="text-xs font-extrabold text-white truncate mt-0.5">' + escHtml(g.title) + '</h4>' +
+            '<p class="text-[11px] text-slate-300/85 mt-1 leading-snug line-clamp-2">' + escHtml(m.reason) + '</p>' +
+            '</div></div>';
+        }).join('');
+
+        box.innerHTML = (res.summary ? '<p class="text-xs text-indigo-200 font-semibold">' + escHtml(res.summary) + '</p>' : '') +
+          '<div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">' + cards + '</div>';
+        box.classList.remove('hidden');
+      }, function(err) {
+        btn.disabled = false;
+        btn.innerText = 'Buscar en mi backlog';
+        notify(err.message || 'Error en busqueda por mood', true);
+      });
+    }
+
+    function runBuyCheck(e) {
+      if (e) e.preventDefault();
+      var title = document.getElementById('buy-title').value.trim();
+      var price = document.getElementById('buy-price').value.trim();
+      if (!title) return;
+      var btn = document.getElementById('btn-buy-go');
+      var box = document.getElementById('buy-results');
+      btn.disabled = true;
+      btn.innerText = 'Analizando...';
+      box.classList.add('hidden');
+
+      callApi('evaluarCompraImpulsivaIA', [title, price], function(res) {
+        btn.disabled = false;
+        btn.innerText = 'Evaluar compra';
+        var toneMap = {
+          good: 'border-emerald-400/35 bg-emerald-950/35 text-emerald-300',
+          warn: 'border-amber-400/35 bg-amber-950/35 text-amber-300',
+          danger: 'border-rose-400/35 bg-rose-950/35 text-rose-300'
+        };
+        var cls = toneMap[res.tone] || toneMap.warn;
+        var sims = (res.similarOwned || []).map(function(s) {
+          var g = allGames.find(function(x) { return String(x.id) === String(s.id); });
+          var clickAttr = g ? ' onclick="openDrawer(\'' + g.id + '\')"' : '';
+          var hoverCls = g ? 'cursor-pointer hover:bg-white/10 ' : '';
+          var metaSpan = g ? '<span class="text-[10px] font-mono text-sky-300 shrink-0">' + escHtml(g.platform) + ' - ' + g.progress + '%</span>' : '';
+          return '<div' + clickAttr + ' class="' + hoverCls + 'flex items-center justify-between gap-3 rounded-xl bg-black/45 border border-white/10 px-3 py-2 transition">' +
+            '<div class="min-w-0"><p class="text-xs font-bold text-white truncate">' + escHtml(s.title) + '</p>' +
+            '<p class="text-[11px] text-slate-400 truncate">' + escHtml(s.note || '') + '</p></div>' + metaSpan + '</div>';
+        }).join('');
+
+        box.innerHTML = '<div class="rounded-2xl border p-4 space-y-3 ' + cls + '">' +
+          '<div class="flex flex-wrap items-center justify-between gap-2">' +
+          '<span class="text-sm font-extrabold uppercase tracking-wide">' + escHtml(res.verdict || 'Veredicto') + '</span>' +
+          '<span class="text-[11px] font-mono text-slate-200">' + escHtml(res.duration || '') + (res.difficulty ? ' - Dif. ' + escHtml(res.difficulty) : '') + '</span></div>' +
+          '<p class="text-xs text-slate-200 leading-relaxed">' + escHtml(res.summary || '') + '</p>' +
+          (sims ? '<div class="space-y-1.5 pt-1"><p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Ya tienes en tu backlog:</p>' + sims + '</div>' : '') +
+          '</div>';
+        box.classList.remove('hidden');
+      }, function(err) {
+        btn.disabled = false;
+        btn.innerText = 'Evaluar compra';
+        notify(err.message || 'Error evaluando compra', true);
+      });
+    }
+
+    function runAiRecommender() {
+      var btn = document.getElementById('btn-ai-rec');
+      var box = document.getElementById('ai-rec-results');
+      btn.disabled = true;
+      btn.innerText = 'Analizando...';
+      box.classList.add('hidden');
+
+      callApi('recomendarProximoJuegoIA', [ecosystem], function(picks) {
+        btn.disabled = false;
+        btn.innerText = 'Volver a recomendar';
+        if (!picks || !picks.length) return notify('No se pudieron generar recomendaciones.', true);
+        box.innerHTML = picks.map(function(p) {
+          var g = allGames.find(function(x) { return String(x.id) === String(p.id); });
+          if (!g) return '';
+          return '<div onclick="openDrawer(\'' + g.id + '\', \'briefing\')" class="cursor-pointer rounded-2xl bg-black/55 hover:bg-black/75 border border-white/15 p-3.5 flex items-center gap-3.5 transition hover:-translate-y-1">' +
+            '<div class="w-12 aspect-[2/3] rounded-xl overflow-hidden shrink-0 border border-white/15 bg-black">' + renderCover(g, 'w-full h-full') + '</div>' +
+            '<div class="min-w-0">' +
+            '<span class="text-[10px] font-extrabold uppercase tracking-wider text-sky-300">' + escHtml(p.tag) + '</span>' +
+            '<h4 class="text-xs font-extrabold text-white truncate mt-0.5">' + escHtml(g.title) + '</h4>' +
+            '<p class="text-[11px] text-slate-300/80 mt-1 leading-snug line-clamp-2">' + escHtml(p.reason) + '</p>' +
+            '</div></div>';
+        }).join('');
+        box.classList.remove('hidden');
+      }, function(err) {
+        btn.disabled = false;
+        btn.innerText = 'Elegir 3 juegos con IA';
+        notify(err.message || 'Error con Gemini AI', true);
+      });
+    }
+
+    function updateCoversButton() {
+      var missing = allGames.filter(function(g) { return matchesEco(g) && !cleanCoverUrl(g); }).length;
+      var btn = document.getElementById('btn-covers');
+      var txt = document.getElementById('btn-covers-text');
+      if (missing > 0) {
+        btn.classList.remove('hidden');
+        btn.classList.add('flex');
+        if (!coversRunning) txt.innerText = 'Caratulas (' + missing + ')';
+      } else {
+        btn.classList.add('hidden');
+        btn.classList.remove('flex');
+      }
+    }
+
+    function runCoverBatch() {
+      if (coversRunning) return;
+      coversRunning = true;
+      var sp = document.getElementById('cover-spinner');
+      var txt = document.getElementById('btn-covers-text');
+      sp.classList.add('animate-spin');
+      txt.innerText = 'Buscando...';
+      notify('Buscando caratulas en paralelo (lote de 25)...');
+
+      callApi('completarCaratulasLote', [ecosystem, 25], function(res) {
+        coversRunning = false;
+        sp.classList.remove('animate-spin');
+        var map = (res && res.updatedMap) || {};
+        Object.keys(map).forEach(function(id) {
+          var g = allGames.find(function(x) { return String(x.id) === String(id); });
+          if (g) g.cover = map[id];
+        });
+        renderAll();
+        notify('Listo: ' + res.found + ' caratulas cargadas' + (res.remaining > 0 ? ' (quedan ' + res.remaining + ')' : '') + '.');
+      }, function(err) {
+        coversRunning = false;
+        sp.classList.remove('animate-spin');
+        updateCoversButton();
+        notify(err.message || 'Error buscando caratulas', true);
+      });
+    }
+
+    function setEcosystem(eco) {
+      ecosystem = eco;
+      var isPS = eco === 'PS';
+      document.body.classList.toggle('eco-switch', !isPS);
+      document.getElementById('eco-ps').className = isPS
+        ? 'px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow transition'
+        : 'px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-bold text-slate-400 hover:text-white transition';
+      document.getElementById('eco-sw').className = !isPS
+        ? 'px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-bold bg-gradient-to-r from-rose-600 to-red-600 text-white shadow transition'
+        : 'px-2.5 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-bold text-slate-400 hover:text-white transition';
+      document.getElementById('brand-icon').className = isPS
+        ? 'w-9 h-9 rounded-xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 border border-sky-400/40 flex items-center justify-center shadow-lg shadow-sky-500/30 transition'
+        : 'w-9 h-9 rounded-xl bg-gradient-to-br from-slate-900 via-rose-950 to-red-950 border border-rose-400/40 flex items-center justify-center shadow-lg shadow-rose-500/30 transition';
+
+      document.getElementById('stab-Platinado').classList.toggle('hidden', !isPS);
+      if (!isPS && currentStatusTab === 'Platinado') currentStatusTab = '100% Completado';
+      document.getElementById('mood-results').classList.add('hidden');
+      document.getElementById('ai-rec-results').classList.add('hidden');
+      libLimit = 30;
+      renderAll();
+    }
+
+    function switchView(view) {
+      currentView = view;
+      ['overview', 'library', 'profile'].forEach(function(v) {
+        var active = v === view;
+        document.getElementById('view-' + v).classList.toggle('hidden', !active);
+        var nb = document.getElementById('nav-' + v);
+        if (nb) nb.className = active ? 'px-4 py-1.5 rounded-lg text-xs font-bold bg-white/15 text-white transition' : 'px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition';
+        var mb = document.getElementById('mnav-' + v);
+        if (mb) mb.className = active ? 'text-white flex flex-col items-center gap-0.5' : 'text-slate-400 flex flex-col items-center gap-0.5';
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function openLibTab(st, sort) {
+      switchView('library');
+      currentStatusTab = st;
+      document.getElementById('libSort').value = sort || 'default';
+      resetLibLimit();
+    }
+
+    function triggerPsnSync() {
+      var sp = document.getElementById('sync-spinner');
+      sp.classList.add('animate-spin');
+      notify('Sincronizando con PlayStation...');
+      callApi('sincronizarPSN', [], function(res) {
+        sp.classList.remove('animate-spin');
+        if (res && Array.isArray(res.games)) allGames = res.games;
+        if (res && res.psnProfile) psnProfile = res.psnProfile;
+        trophyCache = {};
+        renderAll();
+        notify(res.message || 'PSN sincronizado');
+      }, function(err) {
+        sp.classList.remove('animate-spin');
+        notify(err.message || 'Error al sincronizar PSN', true);
+      });
+    }
+
+    function renderAll() {
+      updateCoversButton();
+      renderOverview();
+      renderLibrary();
+      renderMuseum();
+    }
+
+    function posterCardHtml(g, widthClass) {
+      var wc = widthClass || '';
+      var barColor = g.progress >= 100 ? 'bg-emerald-400' : (isSwitch(g) ? 'bg-rose-500' : 'bg-sky-400');
+      var progBadge = g.progress > 0
+        ? '<span class="absolute top-2.5 right-2.5 bg-black/65 backdrop-blur-md font-mono text-[10px] font-bold px-2 py-0.5 rounded-md ' + (g.progress >= 100 ? 'text-emerald-400' : 'text-sky-300') + ' border border-white/15">' + g.progress + '%</span>'
+        : '';
+      return '<div onclick="openDrawer(\'' + g.id + '\')" class="' + wc + ' poster-card cursor-pointer group flex flex-col">' +
+        '<div class="relative aspect-[2/3] bg-black overflow-hidden">' +
+        renderCover(g, 'w-full h-full group-hover:scale-105 transition duration-500') +
+        '<div class="absolute inset-0 bg-gradient-to-t from-[#070910] via-black/15 to-black/30"></div>' +
+        '<span class="absolute top-2.5 left-2.5 bg-black/65 backdrop-blur-md text-[10px] font-bold px-2 py-0.5 rounded-md text-white border border-white/15">' + escHtml(g.platform) + '</span>' +
+        progBadge +
+        '<div class="absolute bottom-3 inset-x-3">' +
+        '<h4 class="text-xs font-extrabold text-white line-clamp-2 leading-snug drop-shadow">' + escHtml(g.title) + '</h4>' +
+        '<p class="text-[10px] font-mono text-slate-300 mt-1">' + g.duration + 'h - Dif. ' + g.difficulty + '/10</p>' +
+        '</div>' +
+        '<div class="absolute bottom-0 inset-x-0 h-1 bg-white/15"><div class="' + barColor + ' h-full" style="width:' + g.progress + '%"></div></div>' +
+        '</div></div>';
+    }
+
+    function renderOverview() {
+      var isPS = ecosystem === 'PS';
+      var list = allGames.filter(matchesEco);
+      var pending = list.filter(function(g) { return g.status === 'Pendiente'; });
+      var playing = list.filter(function(g) { return g.status === 'Jugando'; });
+      var plats = list.filter(function(g) { return g.status === 'Platinado'; });
+      var full100 = list.filter(function(g) { return g.status === '100% Completado' || (g.status === 'Platinado' && g.progress >= 100); });
+      var story = list.filter(function(g) { return g.status === 'Completado'; });
+      var dropped = list.filter(function(g) { return g.status === 'Abandonado'; });
+      var pendingHrs = pending.concat(playing).reduce(function(s, g) { return s + (Number(g.duration) || 0); }, 0);
+
+      document.getElementById('kpi-1-lbl').innerText = isPS ? 'Platinos PS' : 'Switch 100%';
+      document.getElementById('kpi-1-val').innerText = isPS ? plats.length : full100.length;
+      document.getElementById('kpi-1-sub').innerText = isPS
+        ? (plats.filter(function(g) { return g.platform === 'PS5'; }).length + ' PS5 - ' + plats.filter(function(g) { return g.platform === 'PS4'; }).length + ' PS4')
+        : 'Switch / S2';
+      document.getElementById('kpi-2-val').innerText = full100.length;
+      document.getElementById('kpi-3-val').innerText = pending.length + playing.length;
+      document.getElementById('kpi-3-sub').innerText = pendingHrs.toLocaleString() + 'h';
+      document.getElementById('kpi-4-val').innerText = story.length + ' / ' + dropped.length;
+
+      var startedPending = pending.filter(function(g) { return g.progress > 0; }).sort(function(a, b) { return b.progress - a.progress; });
+      var heroGame = playing[0] || startedPending[0] || list[0];
+      var heroEl = document.getElementById('hero-spotlight');
+      if (heroGame) {
+        var coverUrl = cleanCoverUrl(heroGame);
+        var accent = isPS
+          ? 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 shadow-blue-500/30'
+          : 'bg-gradient-to-r from-rose-600 to-orange-500 hover:from-rose-500 hover:to-orange-400 shadow-rose-500/30';
+        var heroBg = coverUrl
+          ? '<div class="absolute inset-0 bg-cover bg-center scale-110 blur-xl opacity-55" style="background-image:url(\'' + escHtml(coverUrl) + '\')"></div>'
+          : '<div class="absolute inset-0 bg-gradient-to-br ' + fallbackGradient(heroGame.title, !isPS) + ' opacity-90"></div>';
+        var primaryTab = isPS ? 'trophies' : 'briefing';
+        var secondaryTab = isPS ? 'briefing' : 'info';
+
+        heroEl.innerHTML = heroBg +
+          '<div class="absolute inset-0 bg-gradient-to-t from-[#04050a] via-[#04050a]/65 to-transparent"></div>' +
+          '<div class="absolute inset-0 bg-gradient-to-r from-[#04050a]/95 via-[#04050a]/45 to-transparent"></div>' +
+          '<div class="relative z-10 w-full p-5 md:p-9 flex flex-col sm:flex-row sm:items-end justify-between gap-5">' +
+          '<div class="flex items-end gap-4 min-w-0">' +
+          '<div class="hidden sm:block w-28 md:w-32 aspect-[2/3] rounded-2xl overflow-hidden border border-white/25 shadow-2xl shrink-0 bg-black">' + renderCover(heroGame, 'w-full h-full') + '</div>' +
+          '<div class="min-w-0">' +
+          '<div class="flex items-center gap-2 mb-2">' +
+          '<span class="px-3 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-white/15 text-white backdrop-blur-md border border-white/15">' + (heroGame.status === 'Jugando' ? 'En curso ahora' : 'Siguiente en tu fila') + '</span>' +
+          '<span class="text-xs font-bold text-sky-300">' + escHtml(heroGame.platform) + '</span></div>' +
+          '<h2 class="text-2xl md:text-4xl font-extrabold text-white tracking-tight leading-tight line-clamp-2 drop-shadow">' + escHtml(heroGame.title) + '</h2>' +
+          '<p class="text-xs md:text-sm text-slate-300 mt-1.5">' + escHtml(heroGame.notes || (heroGame.duration + 'h estimadas - Dificultad ' + heroGame.difficulty + '/10')) + '</p>' +
+          '<div class="mt-3.5 flex items-center gap-3 max-w-sm">' +
+          '<div class="flex-1 bg-white/15 h-2 rounded-full overflow-hidden"><div class="bg-gradient-to-r from-sky-400 to-blue-500 h-full rounded-full" style="width:' + heroGame.progress + '%"></div></div>' +
+          '<span class="font-mono text-xs font-extrabold text-white">' + heroGame.progress + '%</span></div></div></div>' +
+          '<div class="flex items-center gap-2.5 shrink-0">' +
+          '<button type="button" onclick="openDrawer(\'' + heroGame.id + '\', \'' + primaryTab + '\')" class="' + accent + ' text-white text-xs font-extrabold px-5 py-2.5 sm:py-3 rounded-full shadow-lg transition">' + (isPS ? 'Ver trofeos' : 'Briefing IA') + '</button>' +
+          '<button type="button" onclick="openDrawer(\'' + heroGame.id + '\', \'' + secondaryTab + '\')" class="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white text-xs font-bold px-4 py-2.5 sm:py-3 rounded-full border border-white/20 transition">' + (isPS ? 'Briefing IA' : 'Detalles') + '</button>' +
+          '</div></div>';
+      }
+
+      var closest = pending.concat(playing)
+        .filter(function(g) { return g.progress > 0 && g.progress < 100; })
+        .sort(function(a, b) { return b.progress - a.progress; })
+        .slice(0, 12);
+      document.getElementById('shelf-closest').innerHTML = closest.length
+        ? closest.map(function(g) { return posterCardHtml(g, 'w-36 sm:w-44 shrink-0'); }).join('')
+        : '<p class="text-xs text-slate-500 px-1">Aun no hay juegos empezados.</p>';
+
+      var shorts = pending
+        .filter(function(g) { return g.duration > 0 && g.duration <= 15; })
+        .sort(function(a, b) { return a.duration - b.duration; })
+        .slice(0, 12);
+      document.getElementById('shelf-short').innerHTML = shorts.length
+        ? shorts.map(function(g) { return posterCardHtml(g, 'w-36 sm:w-44 shrink-0'); }).join('')
+        : '<p class="text-xs text-slate-500 px-1">No hay juegos cortos pendientes.</p>';
+    }
+
+    function setStatusTab(st) { currentStatusTab = st; resetLibLimit(); }
+    function resetLibLimit() { libLimit = 30; renderLibrary(); }
+    function loadMoreLib() { libLimit += 30; renderLibrary(); }
+
+    function renderLibrary() {
+      var ecoGames = allGames.filter(matchesEco);
+      var isPS = ecosystem === 'PS';
+
+      STATUSES.forEach(function(st) {
+        var cnt = (st === '100% Completado')
+          ? ecoGames.filter(function(g) { return g.status === '100% Completado' || (g.status === 'Platinado' && g.progress >= 100); }).length
+          : ecoGames.filter(function(g) { return g.status === st; }).length;
+        var btn = document.getElementById('stab-' + st);
+        if (!btn) return;
+        var active = st === currentStatusTab;
+        btn.innerHTML = STATUS_LABELS[st] + ' <span class="ml-1 opacity-70 font-mono">' + cnt + '</span>';
+        btn.className = active
+          ? ('shrink-0 px-4 py-2 rounded-full text-xs font-extrabold transition ' + (isPS ? 'bg-white text-black shadow-lg' : 'bg-rose-600 text-white shadow-lg'))
+          : 'shrink-0 px-4 py-2 rounded-full text-xs font-bold bg-white/[0.05] text-slate-300 hover:bg-white/[0.1] border border-white/10 transition';
+      });
+
+      var q = (document.getElementById('libSearch').value || '').toLowerCase().trim();
+      var sort = document.getElementById('libSort').value;
+
+      var filtered = ecoGames.filter(function(g) {
+        if (currentStatusTab === '100% Completado') return g.status === '100% Completado' || (g.status === 'Platinado' && g.progress >= 100);
+        return g.status === currentStatusTab;
+      });
+      if (q) filtered = filtered.filter(function(g) { return g.title.toLowerCase().indexOf(q) !== -1; });
+      if (sort === 'progress') filtered.sort(function(a, b) { return b.progress - a.progress; });
+      else if (sort === 'short') filtered.sort(function(a, b) { return a.duration - b.duration; });
+      else if (sort === 'hard') filtered.sort(function(a, b) { return b.difficulty - a.difficulty; });
+      else if (sort === 'alpha') filtered.sort(function(a, b) { return a.title.localeCompare(b.title); });
+
+      var slice = filtered.slice(0, libLimit);
+      var rem = filtered.length - slice.length;
+      document.getElementById('lib-load-more').classList.toggle('hidden', rem <= 0);
+      document.getElementById('lib-rem').innerText = rem;
+
+      var grid = document.getElementById('lib-grid');
+      if (!slice.length) {
+        grid.innerHTML = '<div class="col-span-full py-16 text-center text-xs text-slate-500">No hay juegos en "' + STATUS_LABELS[currentStatusTab] + '".</div>';
+        return;
+      }
+      grid.innerHTML = slice.map(function(g) { return posterCardHtml(g, ''); }).join('');
+    }
+
+    function setMuseumFilter(f) {
+      museumEcoFilter = f;
+      ['all', 'PS', 'Switch'].forEach(function(k) {
+        var b = document.getElementById('meco-' + k);
+        if (b) b.className = (k === f)
+          ? 'px-3 py-1 rounded-full font-bold bg-white text-black transition'
+          : 'px-3 py-1 rounded-full font-bold text-slate-300 hover:text-white transition';
+      });
+      renderMuseumWall();
+    }
+
+    function renderMuseum() {
+      var psPlats = allGames.filter(function(g) { return !isSwitch(g) && g.status === 'Platinado'; });
+      var sw100 = allGames.filter(function(g) { return isSwitch(g) && g.status === '100% Completado'; });
+      var allExhibited = psPlats.concat(sw100);
+
+      document.getElementById('u-plats').innerText = psPlats.length;
+      document.getElementById('u-plats-sub').innerText = psPlats.filter(function(g) { return g.platform === 'PS5'; }).length + ' PS5 - ' + psPlats.filter(function(g) { return g.platform === 'PS4'; }).length + ' PS4';
+      document.getElementById('u-sw100').innerText = sw100.length;
+      document.getElementById('u-hard-count').innerText = allExhibited.filter(function(g) { return Number(g.difficulty) >= 8; }).length;
+      document.getElementById('u-total-done').innerText = allExhibited.length;
+      document.getElementById('u-total-sub').innerText = psPlats.length + ' PS - ' + sw100.length + ' Nintendo';
+
+      var totalHrs = allExhibited.reduce(function(s, g) { return s + (Number(g.duration) || 0); }, 0);
+      document.getElementById('museum-total-hours').innerText = totalHrs.toLocaleString() + ' horas conquistadas en total';
+
+      var cachedCurator = curatorCache.PS || curatorCache.Switch;
+      if (cachedCurator) {
+        document.getElementById('curator-archetype').innerText = cachedCurator.archetype || 'Coleccionista';
+        document.getElementById('curator-plaque').innerText = cachedCurator.plaque || '';
+      }
+
+      if (psnProfile) {
+        if (psnProfile.avatar) document.getElementById('prof-avatar-wrap').innerHTML = '<img src="' + escHtml(psnProfile.avatar) + '" referrerpolicy="no-referrer" class="w-full h-full object-cover">';
+        document.getElementById('live-level').innerText = psnProfile.trophyLevel || '-';
+        var et = psnProfile.earnedTrophies || {};
+        document.getElementById('live-plat').innerText = (et.platinum != null) ? et.platinum : '-';
+        document.getElementById('live-gold').innerText = (et.gold != null) ? et.gold : '-';
+        document.getElementById('live-silver').innerText = (et.silver != null) ? et.silver : '-';
+        document.getElementById('live-bronze').innerText = (et.bronze != null) ? et.bronze : '-';
+        var sumT = (Number(et.platinum) || 0) + (Number(et.gold) || 0) + (Number(et.silver) || 0) + (Number(et.bronze) || 0);
+        document.getElementById('u-trophies-total').innerText = sumT > 0 ? (sumT.toLocaleString() + ' trofeos totales en PSN') : 'Trofeos PSN: -';
+        if (psnProfile.lastSync) {
+          var d = new Date(psnProfile.lastSync);
+          document.getElementById('prof-sync-time').innerText = 'Sync PSN: ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+      }
+
+      var masterSec = document.getElementById('masterpieces-section');
+      if (!allExhibited.length) {
+        masterSec.classList.add('hidden');
+      } else {
+        masterSec.classList.remove('hidden');
+        var hardest = allExhibited.slice()
+          .sort(function(a, b) { return (Number(b.difficulty) - Number(a.difficulty)) || (Number(b.duration) - Number(a.duration)); })
+          .slice(0, 4);
+
+        document.getElementById('museum-pedestals').innerHTML = hardest.map(function(g, idx) {
+          var sw = isSwitch(g);
+          var frameCls = sw ? 'pedestal-crimson' : (g.difficulty >= 8 ? 'pedestal-diamond' : 'pedestal-gold');
+          var rankColor = sw ? 'text-rose-300' : (g.difficulty >= 8 ? 'text-purple-300' : 'text-amber-300');
+          return '<div onclick="openDrawer(\'' + g.id + '\')" class="' + frameCls + ' rounded-2xl overflow-hidden bg-[#0a0c14] cursor-pointer group transition hover:-translate-y-1.5 flex flex-col">' +
+            '<div class="relative aspect-[2/3] bg-black overflow-hidden">' +
+            renderCover(g, 'w-full h-full group-hover:scale-105 transition duration-700') +
+            '<div class="absolute inset-0 bg-gradient-to-t from-[#0a0c14] via-transparent to-black/40"></div>' +
+            '<span class="absolute top-2.5 left-2.5 text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md ' + rankColor + ' border border-white/15">#' + (idx + 1) + ' - Dif. ' + g.difficulty + '/10</span>' +
+            '<span class="absolute top-2.5 right-2.5 text-[10px] font-bold px-2 py-0.5 rounded-md bg-black/75 text-white border border-white/15">' + escHtml(g.platform) + '</span>' +
+            '</div>' +
+            '<div class="p-3.5 text-center border-t border-white/10">' +
+            '<h4 class="font-display text-xs md:text-sm font-bold text-white leading-tight line-clamp-1">' + escHtml(g.title) + '</h4>' +
+            '<p class="text-[10px] md:text-[11px] font-mono text-slate-400 mt-1">' + g.duration + 'h - ' + (sw ? '100% Switch' : 'Platino') + '</p>' +
+            '</div></div>';
+        }).join('');
+      }
+
+      var total = allGames.length || 1;
+      var counts = {
+        'Platinado': psPlats.length,
+        '100% Completado': allGames.filter(function(g) { return g.status === '100% Completado'; }).length,
+        'Completado': allGames.filter(function(g) { return g.status === 'Completado'; }).length,
+        'Jugando': allGames.filter(function(g) { return g.status === 'Jugando'; }).length,
+        'Pendiente': allGames.filter(function(g) { return g.status === 'Pendiente'; }).length,
+        'Abandonado': allGames.filter(function(g) { return g.status === 'Abandonado'; }).length
+      };
+      var doneTotal = counts['Platinado'] + counts['100% Completado'] + counts['Completado'];
+      var activeTotal = total - counts['Abandonado'];
+      var rate = activeTotal > 0 ? ((doneTotal / activeTotal) * 100).toFixed(1) : '0.0';
+      document.getElementById('museum-rate').innerText = rate + '% tasa global';
+
+      var segs = [
+        { k: 'Platinado', label: 'Platinos PS', color: 'bg-sky-400' },
+        { k: '100% Completado', label: 'Al 100%', color: 'bg-rose-400' },
+        { k: 'Completado', label: 'Historia', color: 'bg-indigo-400' },
+        { k: 'Jugando', label: 'Jugando', color: 'bg-amber-400' },
+        { k: 'Pendiente', label: 'Pendientes', color: 'bg-slate-600' },
+        { k: 'Abandonado', label: 'Abandonados', color: 'bg-rose-900' }
+      ];
+      document.getElementById('prof-dist-bar').innerHTML = segs.map(function(s) {
+        var w = (counts[s.k] / total) * 100;
+        return w > 0 ? '<div class="' + s.color + ' h-full" style="width:' + w + '%"></div>' : '';
+      }).join('');
+      document.getElementById('prof-dist-legend').innerHTML = segs.map(function(s) {
+        return '<span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full ' + s.color + '"></span>' + s.label + ' <b class="text-white font-mono">' + counts[s.k] + '</b></span>';
+      }).join('');
+
+      renderMuseumWall();
+    }
+
+    function renderMuseumWall() {
+      var q = (document.getElementById('museumSearch').value || '').toLowerCase().trim();
+      var sort = document.getElementById('museumSort').value;
+
+      var pieces = allGames.filter(function(g) {
+        var isPlat = !isSwitch(g) && g.status === 'Platinado';
+        var isSw100 = isSwitch(g) && g.status === '100% Completado';
+        if (museumEcoFilter === 'PS') return isPlat;
+        if (museumEcoFilter === 'Switch') return isSw100;
+        return isPlat || isSw100;
+      });
+
+      document.getElementById('wall-title').innerText = 'Muro de Conquistas (' + pieces.length + ')';
+      pieces = pieces.map(function(g, i) {
+        var copy = Object.assign({}, g);
+        copy.museumNum = i + 1;
+        return copy;
+      });
+      if (q) pieces = pieces.filter(function(g) { return g.title.toLowerCase().indexOf(q) !== -1; });
+      if (sort === 'hard') pieces.sort(function(a, b) { return (b.difficulty - a.difficulty) || (b.duration - a.duration); });
+      else if (sort === 'hours') pieces.sort(function(a, b) { return b.duration - a.duration; });
+
+      var wall = document.getElementById('museum-wall');
+      if (!pieces.length) {
+        wall.innerHTML = '<div class="col-span-full py-14 text-center text-xs text-slate-500">Sin piezas para este filtro.</div>';
+        return;
+      }
+
+      wall.innerHTML = pieces.map(function(g) {
+        var sw = isSwitch(g);
+        var num = String(g.museumNum).padStart(2, '0');
+        return '<div onclick="openDrawer(\'' + g.id + '\')" class="poster-card cursor-pointer group">' +
+          '<div class="relative aspect-[2/3] bg-black overflow-hidden">' +
+          renderCover(g, 'w-full h-full group-hover:scale-105 transition duration-500') +
+          '<div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent"></div>' +
+          '<span class="absolute top-2 left-2 font-mono text-[10px] font-bold text-white bg-black/75 backdrop-blur-md px-1.5 py-0.5 rounded border border-white/10">#' + num + '</span>' +
+          '<span class="absolute top-2 right-2 text-[9px] font-extrabold px-1.5 py-0.5 rounded ' + (sw ? 'bg-rose-500/85 text-white' : 'bg-sky-500/85 text-black') + '">' + (sw ? '100%' : 'PLAT') + '</span>' +
+          '<div class="absolute bottom-2.5 inset-x-2.5">' +
+          '<h4 class="text-xs font-extrabold text-white line-clamp-2 leading-tight">' + escHtml(g.title) + '</h4>' +
+          '<p class="text-[10px] font-mono text-slate-300 mt-0.5">Dif. ' + g.difficulty + '/10 - ' + g.duration + 'h</p>' +
+          '</div></div></div>';
+      }).join('');
+    }
+
+    function refreshCuratorPlaque() {
+      var btn = document.getElementById('btn-curator');
+      btn.disabled = true;
+      btn.innerText = 'Redactando...';
+      callApi('generarPlacaCuradorIA', [ecosystem], function(res) {
+        btn.disabled = false;
+        btn.innerText = 'Actualizar placa IA';
+        curatorCache.PS = res;
+        renderMuseum();
+        notify('Placa del curador actualizada');
+      }, function(err) {
+        btn.disabled = false;
+        btn.innerText = 'Redactar placa IA';
+        notify(err.message || 'Error con Gemini AI', true);
+      });
+    }
+
+    function openDrawer(id, defaultTab) {
+      var g = allGames.find(function(x) { return String(x.id) === String(id); });
+      if (!g) return;
+      activeGameId = g.id;
+
+      var cUrl = cleanCoverUrl(g);
+      document.getElementById('d-bg-blur').style.backgroundImage = cUrl ? ('url("' + cUrl + '")') : 'none';
+      document.getElementById('d-cover-wrap').innerHTML = renderCover(g, 'w-full h-full');
+      document.getElementById('d-platform').innerText = g.platform;
+      var ab = document.getElementById('d-alerts-badge');
+      ab.innerText = g.alerts || '';
+      ab.classList.toggle('hidden', !g.alerts);
+      document.getElementById('d-title').innerText = g.title;
+      document.getElementById('d-meta').innerText = g.progress + '% - ' + g.duration + 'h - Dif. ' + g.difficulty + '/10';
+
+      document.getElementById('d-prog-slider').value = g.progress;
+      document.getElementById('d-prog-label').innerText = g.progress + '%';
+      document.getElementById('d-duration').value = g.duration;
+      document.getElementById('d-difficulty').value = g.difficulty;
+      document.getElementById('d-worth').value = g.worthIt || '';
+      document.getElementById('d-alerts').value = g.alerts || '';
+      document.getElementById('d-notes').value = g.notes || '';
+      document.getElementById('d-cover-url').value = cUrl;
+      document.getElementById('trophy-ai-box').classList.add('hidden');
+
+      renderDrawerStatusButtons(g);
+      var sw = isSwitch(g);
+      document.getElementById('dtab-trophies').classList.toggle('hidden', sw);
+      var tab = defaultTab || 'info';
+      var initialTab = (sw && tab === 'trophies') ? 'briefing' : tab;
+      switchDrawerTab(initialTab);
+      document.getElementById('detailDrawer').classList.remove('hidden');
+    }
+
+    function closeDrawer() {
+      document.getElementById('detailDrawer').classList.add('hidden');
+      activeGameId = null;
+    }
+
+    function renderDrawerStatusButtons(g) {
+      var list = isSwitch(g) ? STATUSES.filter(function(s) { return s !== 'Platinado'; }) : STATUSES;
+      document.getElementById('d-status-grid').innerHTML = list.map(function(st) {
+        var active = g.status === st;
+        return '<button type="button" onclick="changeDrawerStatus(\'' + st + '\')" class="py-2.5 px-3 rounded-xl text-xs font-bold border transition ' +
+          (active ? 'bg-white text-black border-white shadow' : 'bg-white/[0.05] border-white/10 text-slate-300 hover:bg-white/10') +
+          '">' + STATUS_LABELS[st] + '</button>';
+      }).join('');
+    }
+
+    function changeDrawerStatus(st) {
+      var g = allGames.find(function(x) { return String(x.id) === String(activeGameId); });
+      if (!g) return;
+      g.status = st;
+      if (st === 'Platinado' || st === '100% Completado') {
+        g.progress = 100;
+        document.getElementById('d-prog-slider').value = 100;
+        document.getElementById('d-prog-label').innerText = '100%';
+      }
+      renderDrawerStatusButtons(g);
+      renderAll();
+      notify('Estado actualizado');
+      callApi('updateGameField', [g.id, { status: st, progress: g.progress }], null, function(err) {
+        notify(err.message || 'Error guardando estado', true);
+      });
+    }
+
+    function saveDrawerProgress() {
+      var g = allGames.find(function(x) { return String(x.id) === String(activeGameId); });
+      if (!g) return;
+      g.progress = Number(document.getElementById('d-prog-slider').value);
+      document.getElementById('d-meta').innerText = g.progress + '% - ' + g.duration + 'h - Dif. ' + g.difficulty + '/10';
+      renderAll();
+      notify('Progreso guardado');
+      callApi('updateGameField', [g.id, { progress: g.progress }], null, function(err) {
+        notify(err.message || 'Error guardando progreso', true);
+      });
+    }
+
+    function saveDrawerDetails() {
+      var g = allGames.find(function(x) { return String(x.id) === String(activeGameId); });
+      if (!g) return;
+      g.duration = Number(document.getElementById('d-duration').value) || 20;
+      g.difficulty = Number(document.getElementById('d-difficulty').value) || 4;
+      g.worthIt = document.getElementById('d-worth').value.trim();
+      g.alerts = document.getElementById('d-alerts').value.trim();
+      g.notes = document.getElementById('d-notes').value.trim();
+      g.cover = document.getElementById('d-cover-url').value.trim();
+      renderAll();
+      closeDrawer();
+      notify('Cambios guardados');
+      callApi('updateGameField', [g.id, {
+        duration: g.duration, difficulty: g.difficulty, worthIt: g.worthIt,
+        alerts: g.alerts, notes: g.notes, cover: g.cover
+      }], null, function(err) {
+        notify(err.message || 'Error guardando cambios', true);
+      });
+    }
+
+    function reanalyzeActiveGame() {
+      var g = allGames.find(function(x) { return String(x.id) === String(activeGameId); });
+      if (!g) return;
+      var btn = document.getElementById('btn-reanalyze');
+      btn.disabled = true;
+      btn.innerText = 'Buscando...';
+      callApi('reanalizarJuegoIA', [g.id, g.title, g.platform], function(ai) {
+        btn.disabled = false;
+        btn.innerText = 'IA + Caratula';
+        g.duration = ai.duration;
+        g.difficulty = ai.difficulty;
+        g.worthIt = ai.worthIt;
+        g.alerts = ai.alerts;
+        if (ai.cover) g.cover = ai.cover;
+        document.getElementById('d-duration').value = ai.duration;
+        document.getElementById('d-difficulty').value = ai.difficulty;
+        document.getElementById('d-worth').value = ai.worthIt;
+        document.getElementById('d-alerts').value = ai.alerts;
+        if (ai.cover) {
+          document.getElementById('d-cover-url').value = ai.cover;
+          document.getElementById('d-cover-wrap').innerHTML = renderCover(g, 'w-full h-full');
+          document.getElementById('d-bg-blur').style.backgroundImage = 'url("' + ai.cover + '")';
+        }
+        document.getElementById('d-meta').innerText = g.progress + '% - ' + g.duration + 'h - Dif. ' + g.difficulty + '/10';
+        var ab = document.getElementById('d-alerts-badge');
+        ab.innerText = ai.alerts || '';
+        ab.classList.toggle('hidden', !ai.alerts);
+        renderAll();
+        notify('Datos y caratula actualizados');
+      }, function(err) {
+        btn.disabled = false;
+        btn.innerText = 'IA + Caratula';
+        notify(err.message || 'Error con Gemini AI', true);
+      });
+    }
+
+    function deleteActiveGame() {
+      if (!confirm('Eliminar este juego de tu biblioteca?')) return;
+      var id = activeGameId;
+      allGames = allGames.filter(function(x) { return String(x.id) !== String(id); });
+      closeDrawer();
+      renderAll();
+      notify('Juego eliminado');
+      callApi('deleteGame', [id], null, function(err) {
+        notify(err.message || 'Error eliminando juego', true);
+      });
+    }
+
+    function switchDrawerTab(tab) {
+      ['info', 'briefing', 'trophies'].forEach(function(t) {
+        var active = t === tab;
+        document.getElementById('dpanel-' + t).classList.toggle('hidden', !active);
+        var btn = document.getElementById('dtab-' + t);
+        if (btn) btn.className = active
+          ? 'px-3.5 py-1.5 rounded-full text-xs font-bold bg-white text-black transition'
+          : 'px-3.5 py-1.5 rounded-full text-xs font-bold bg-white/10 text-slate-200 hover:bg-white/20 transition';
+      });
+      if (tab === 'briefing') renderBriefingState();
+      if (tab === 'trophies') loadTrophiesForActiveGame();
+    }
+
+    function renderBriefingState() {
+      var g = allGames.find(function(x) { return String(x.id) === String(activeGameId); });
+      if (!g) return;
+      var empty = document.getElementById('briefing-empty');
+      var loader = document.getElementById('briefing-loader');
+      var content = document.getElementById('briefing-content');
+      loader.classList.add('hidden');
+
+      if (g.briefing && g.briefing.runs) {
+        empty.classList.add('hidden');
+        renderBriefingCards(g.briefing);
+        content.classList.remove('hidden');
+      } else {
+        content.classList.add('hidden');
+        empty.classList.remove('hidden');
+      }
+    }
+
+    function renderBriefingCards(b) {
+      document.getElementById('briefing-content').innerHTML =
+        '<div class="rounded-2xl bg-gradient-to-br from-indigo-950/60 to-sky-950/40 border border-indigo-400/30 p-4 space-y-1.5">' +
+        '<p class="text-[10px] font-extrabold uppercase tracking-widest text-sky-300">Consejo de arranque</p>' +
+        '<p class="text-sm font-bold text-white leading-relaxed">' + escHtml(b.startTip || '') + '</p></div>' +
+        '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">' +
+        '<div class="rounded-2xl bg-white/[0.04] border border-white/10 p-3.5"><p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Partidas necesarias</p><p class="text-xs font-semibold text-white mt-1 leading-snug">' + escHtml(b.runs || '-') + '</p></div>' +
+        '<div class="rounded-2xl bg-white/[0.04] border border-white/10 p-3.5"><p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Dificultad</p><p class="text-xs font-semibold text-white mt-1 leading-snug">' + escHtml(b.difficultyReq || '-') + '</p></div>' +
+        '<div class="rounded-2xl bg-white/[0.04] border border-amber-400/20 p-3.5"><p class="text-[10px] font-bold uppercase tracking-wider text-amber-300">Perdibles (sin spoilers)</p><p class="text-xs font-semibold text-slate-200 mt-1 leading-snug">' + escHtml(b.missables || '-') + '</p></div>' +
+        '<div class="rounded-2xl bg-white/[0.04] border border-white/10 p-3.5"><p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Online / Coop</p><p class="text-xs font-semibold text-white mt-1 leading-snug">' + escHtml(b.online || '-') + '</p></div>' +
+        '</div>' +
+        '<div class="text-right pt-1"><button type="button" onclick="loadBriefingAI(true)" class="text-[11px] font-semibold text-slate-400 hover:text-white transition">Regenerar briefing</button></div>';
+    }
+
+    function loadBriefingAI(forceRefresh) {
+      var g = allGames.find(function(x) { return String(x.id) === String(activeGameId); });
+      if (!g) return;
+      document.getElementById('briefing-empty').classList.add('hidden');
+      document.getElementById('briefing-content').classList.add('hidden');
+      document.getElementById('briefing-loader').classList.remove('hidden');
+
+      callApi('generarBriefingPlatinoIA', [g.id, g.title, g.platform, Boolean(forceRefresh)], function(briefing) {
+        document.getElementById('briefing-loader').classList.add('hidden');
+        g.briefing = briefing;
+        renderBriefingCards(briefing);
+        document.getElementById('briefing-content').classList.remove('hidden');
+        notify('Briefing guardado en tu base de datos');
+      }, function(err) {
+        document.getElementById('briefing-loader').classList.add('hidden');
+        renderBriefingState();
+        notify(err.message || 'Error generando briefing', true);
+      });
+    }
+
+    function loadTrophiesForActiveGame() {
+      var g = allGames.find(function(x) { return String(x.id) === String(activeGameId); });
+      if (!g) return;
+      document.getElementById('trophy-error').classList.add('hidden');
+      if (trophyCache[g.id]) {
+        currentTrophies = trophyCache[g.id];
+        renderTrophyList();
+        return;
+      }
+      document.getElementById('trophy-list').innerHTML = '';
+      document.getElementById('trophy-loader').classList.remove('hidden');
+      document.getElementById('btn-trophy-ai').classList.add('hidden');
+
+      callApi('obtenerTrofeosDeJuego', [g.id, g.title, g.platform, g.psnMeta || ''], function(list) {
+        document.getElementById('trophy-loader').classList.add('hidden');
+        trophyCache[g.id] = list || [];
+        currentTrophies = trophyCache[g.id];
+        renderTrophyList();
+      }, function(err) {
+        document.getElementById('trophy-loader').classList.add('hidden');
+        var box = document.getElementById('trophy-error');
+        box.innerText = err.message || 'No se pudieron cargar los trofeos.';
+        box.classList.remove('hidden');
+      });
+    }
+
+    function setTrophyFilter(f) {
+      trophyFilter = f;
+      ['missing', 'earned', 'all'].forEach(function(k) {
+        document.getElementById('tf-' + k).className = (k === f)
+          ? 'px-3.5 py-1 rounded-full font-bold bg-white text-black transition'
+          : 'px-3.5 py-1 rounded-full font-bold text-slate-400 hover:text-white transition';
+      });
+      renderTrophyList();
+    }
+
+    function renderTrophyList() {
+      var earnedCount = currentTrophies.filter(function(t) { return t.earned; }).length;
+      var missingCount = currentTrophies.length - earnedCount;
+      document.getElementById('trophy-count-badge').innerText = earnedCount + ' / ' + currentTrophies.length;
+      document.getElementById('btn-trophy-ai').classList.toggle('hidden', missingCount === 0);
+
+      var list = currentTrophies;
+      if (trophyFilter === 'missing') list = currentTrophies.filter(function(t) { return !t.earned; });
+      else if (trophyFilter === 'earned') list = currentTrophies.filter(function(t) { return t.earned; });
+
+      var box = document.getElementById('trophy-list');
+      if (!list.length) {
+        box.innerHTML = '<p class="text-xs text-slate-400 text-center py-10">' + (trophyFilter === 'missing' ? 'Todos los trofeos completados.' : 'Ningun trofeo obtenido aun.') + '</p>';
+        return;
+      }
+
+      box.innerHTML = list.map(function(t) {
+        var dateTxt = (t.earned && t.earnedDate) ? new Date(t.earnedDate).toLocaleDateString() : 'Pendiente';
+        return '<div class="rounded-2xl p-3.5 flex items-start gap-3.5 border transition ' + (t.earned ? 'bg-emerald-500/10 border-emerald-400/25' : 'bg-white/[0.04] border-white/10') + '">' +
+          '<img src="' + escHtml(t.icon) + '" referrerpolicy="no-referrer" class="w-12 h-12 rounded-xl bg-black object-cover shrink-0 ' + (t.earned ? '' : 'opacity-45 grayscale') + '">' +
+          '<div class="min-w-0 flex-1">' +
+          '<div class="flex items-center justify-between gap-2">' +
+          '<h5 class="text-xs font-bold text-white truncate">' + escHtml(t.name) + '</h5>' +
+          '<span class="shrink-0">' + trophySvg(t.type, 'w-4 h-4') + '</span></div>' +
+          '<p class="text-[11px] text-slate-300/80 mt-1 leading-relaxed">' + escHtml(t.detail || (t.hidden ? 'Trofeo oculto' : '')) + '</p>' +
+          '<div class="flex items-center justify-between text-[10px] text-slate-400 mt-2 font-mono">' +
+          '<span>' + (t.rarity ? (t.rarity + '% rareza') : '') + '</span>' +
+          '<span>' + dateTxt + '</span></div></div></div>';
+      }).join('');
+    }
+
+    function analyzeMissingTrophiesAI() {
+      var g = allGames.find(function(x) { return String(x.id) === String(activeGameId); });
+      if (!g) return;
+      var missing = currentTrophies.filter(function(t) { return !t.earned; });
+      var btn = document.getElementById('btn-trophy-ai');
+      var box = document.getElementById('trophy-ai-box');
+      btn.disabled = true;
+      btn.innerText = 'Analizando...';
+
+      callApi('analizarTrofeosFaltantesIA', [g.title, missing], function(res) {
+        btn.disabled = false;
+        btn.innerText = 'Estrategia IA';
+        var qw = (res.quickWins && res.quickWins.length)
+          ? '<div><span class="text-[10px] uppercase font-bold text-emerald-400">Rapidos primero:</span><ul class="list-disc pl-4 mt-1 text-slate-200 space-y-0.5">' + res.quickWins.map(function(q) { return '<li>' + escHtml(q) + '</li>'; }).join('') + '</ul></div>'
+          : '';
+        var ho = (res.hardOnes && res.hardOnes.length)
+          ? '<div><span class="text-[10px] uppercase font-bold text-amber-400">Los mas pesados:</span><ul class="list-disc pl-4 mt-1 text-slate-200 space-y-0.5">' + res.hardOnes.map(function(h) { return '<li>' + escHtml(h) + '</li>'; }).join('') + '</ul></div>'
+          : '';
+        box.innerHTML = '<p class="font-bold text-indigo-200 leading-relaxed">' + escHtml(res.verdict || '') + '</p>' + qw + ho;
+        box.classList.remove('hidden');
+      }, function(err) {
+        btn.disabled = false;
+        btn.innerText = 'Estrategia IA';
+        notify(err.message || 'Error analizando trofeos', true);
+      });
+    }
+
+    function openAddModal() {
+      document.getElementById('new-platform').value = ecosystem === 'Switch' ? 'Switch' : 'PS5';
+      document.getElementById('addModal').classList.remove('hidden');
+      setTimeout(function() { document.getElementById('new-title').focus(); }, 80);
+    }
+    function closeAddModal() { document.getElementById('addModal').classList.add('hidden'); }
+
+    function submitNewGame(e) {
+      e.preventDefault();
+      var useAI = document.getElementById('new-use-ai').checked;
+      var btn = document.getElementById('btn-submit-new');
+      var payload = {
+        id: String(new Date().getTime()),
+        title: document.getElementById('new-title').value.trim(),
+        platform: document.getElementById('new-platform').value,
+        status: document.getElementById('new-status').value,
+        useAI: useAI
+      };
+
+      btn.disabled = true;
+      btn.innerText = useAI ? 'Analizando y buscando portada...' : 'Guardando...';
+
+      callApi('addGame', [payload], function(savedGame) {
+        btn.disabled = false;
+        btn.innerText = 'Guardar juego';
+        allGames.unshift(savedGame);
+        document.getElementById('addForm').reset();
+        closeAddModal();
+        renderAll();
+        notify(useAI ? ('Agregado (' + savedGame.duration + 'h - Dif. ' + savedGame.difficulty + '/10)') : 'Juego agregado');
+      }, function(err) {
+        btn.disabled = false;
+        btn.innerText = 'Guardar juego';
+        notify(err.message || 'Error al guardar', true);
+      });
+    }
+  </script>
+</body>
+</html>
+
+manifest
+{
+  "name": "PlatDex",
+  "short_name": "PlatDex",
+  "description": "Backlog, trofeos PSN y 100% Nintendo",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#04050a",
+  "theme_color": "#04050a",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
